@@ -378,6 +378,76 @@ export const SEARCH_QUERY = `
   }
 `;
 
+export const SEARCH_PAGE_QUERY = `
+  query SearchPage($query: String!, $first: Int = 24, $after: String, $sortKey: SearchSortKeys = RELEVANCE, $reverse: Boolean = false, $productFilters: [ProductFilter!]) {
+    search(query: $query, first: $first, after: $after, types: PRODUCT, sortKey: $sortKey, reverse: $reverse, productFilters: $productFilters) {
+      nodes {
+        ... on Product {
+          id
+          title
+          handle
+          description
+          tags
+          productType
+          createdAt
+          priceRange {
+            minVariantPrice {
+              amount
+              currencyCode
+            }
+          }
+          compareAtPriceRange {
+            minVariantPrice {
+              amount
+              currencyCode
+            }
+          }
+          featuredImage {
+            url
+            altText
+            width
+            height
+          }
+          images(first: 2) {
+            edges {
+              node {
+                url
+                altText
+                width
+                height
+              }
+            }
+          }
+          variants(first: 1) {
+            edges {
+              node {
+                id
+                availableForSale
+              }
+            }
+          }
+        }
+      }
+      productFilters {
+        id
+        label
+        type
+        values {
+          id
+          label
+          count
+          input
+        }
+      }
+      totalCount
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
 export const CREATE_CART_MUTATION = `
   mutation CreateCart($lines: [CartLineInput!]) {
     cartCreate(input: { lines: $lines }) {

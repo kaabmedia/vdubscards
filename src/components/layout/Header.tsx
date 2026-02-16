@@ -270,7 +270,7 @@ export function Header({ menuItems = [] }: HeaderProps) {
         <div className="flex items-center gap-2">
           {/* Search bar */}
           <form
-            action="/zoeken"
+            action="/search"
             method="GET"
             className={`hidden items-center gap-2 rounded-full border bg-muted/50 px-3 py-1.5 text-sm text-muted-foreground transition-all duration-300 md:flex ${
               searchFocused
@@ -369,7 +369,7 @@ export function Header({ menuItems = [] }: HeaderProps) {
           )}
           {/* Mobile search */}
           <form
-            action="/zoeken"
+            action="/search"
             method="GET"
             className="mt-3 flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-2 text-sm transition-all focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(255,204,2,0.15)]"
           >

@@ -195,3 +195,15 @@ export interface SearchResponse {
     pageInfo: { hasNextPage: boolean; endCursor: string | null };
   };
 }
+
+export interface SearchPageResponse {
+  search: {
+    nodes: (ShopifyProduct | null)[];
+    productFilters: ShopifyFilter[];
+    totalCount: number;
+    pageInfo: {
+      hasNextPage: boolean;
+      endCursor: string | null;
+    };
+  };
+}
