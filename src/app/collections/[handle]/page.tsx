@@ -114,7 +114,7 @@ export default async function CollectionPage({ params, searchParams }: Props) {
               </h1>
               {totalProductsCount != null && (
                 <p className="mt-2 text-sm text-muted-foreground">
-                  {totalProductsCount} product{totalProductsCount !== 1 ? "en" : ""} in deze collectie
+                  {totalProductsCount} product{totalProductsCount !== 1 ? "s" : ""} in this collection
                 </p>
               )}
               {collection.description && (
@@ -133,7 +133,7 @@ export default async function CollectionPage({ params, searchParams }: Props) {
             </h1>
             {totalProductsCount != null && (
               <p className="mt-2 text-sm text-muted-foreground">
-                {totalProductsCount} product{totalProductsCount !== 1 ? "en" : ""} in deze collectie
+                {totalProductsCount} product{totalProductsCount !== 1 ? "s" : ""} in this collection
               </p>
             )}
             {collection.description && (

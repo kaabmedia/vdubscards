@@ -32,6 +32,13 @@ export default async function HomePage() {
 
   const { countdown, heroFloatingCardsSource, heroFloatingCards, newDrop, eventsSlider } = home;
 
+  const countdownEnded =
+    countdown.enabled &&
+    countdown.endDate &&
+    new Date(countdown.endDate).getTime() <= Date.now();
+
+  const showNewDrop = newDrop.enabled && (!countdown.enabled || countdownEnded);
+
   const productPoolForCards = pool.length > 0 ? pool : products;
   const floatingCards =
     heroFloatingCardsSource === "products"
@@ -60,7 +67,7 @@ export default async function HomePage() {
           <HeroSection floatingCards={floatingCards} />
         )}
       </div>
-      {newDrop.enabled && (
+      {showNewDrop && (
         <NewDropSection
           imageUrl={newDrop.imageUrl}
           title={newDrop.title}

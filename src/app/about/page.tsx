@@ -82,7 +82,7 @@ export default function AboutPage() {
             </div>
             <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-gray-200">
               <Image
-                src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80"
+                src="/about-1.jpeg"
                 alt="V-Dub's Cards team"
                 fill
                 className="object-cover"
@@ -120,7 +120,7 @@ export default function AboutPage() {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div className="relative order-2 aspect-[4/5] overflow-hidden rounded-xl bg-gray-200 lg:order-1">
               <Image
-                src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80"
+                src="/about-2.jpeg"
                 alt="V-Dub's Cards family"
                 fill
                 className="object-cover"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Send, Check } from "lucide-react";
 
 interface CountdownHeroSectionProps {
   endDate: string;
@@ -64,6 +65,10 @@ export function CountdownHeroSection({
     e.preventDefault();
     if (email) {
       setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        setEmail("");
+      }, 2000);
     }
   };
 
@@ -124,23 +129,39 @@ export function CountdownHeroSection({
 
           <form
             onSubmit={handleSubmit}
-            className="mt-8 flex w-full max-w-sm gap-2"
+            className="mt-8 flex w-full max-w-md gap-3 sm:gap-0"
           >
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              required
-              disabled={submitted}
-              className="h-12 flex-1 rounded-lg border border-gray-600 bg-gray-800 px-4 text-sm text-white placeholder:text-gray-500 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
-            />
+            <div className="relative flex-1">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                required
+                disabled={submitted}
+                className="h-12 w-full rounded-lg border border-gray-600 bg-gray-800 px-4 text-sm text-white placeholder:text-gray-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 sm:rounded-r-none sm:border-r-0"
+              />
+            </div>
             <button
               type="submit"
               disabled={submitted}
-              className="h-12 shrink-0 rounded-lg bg-gray-900 px-6 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-default disabled:bg-emerald-600 disabled:text-white"
+              className={`flex h-12 shrink-0 items-center gap-2 rounded-lg px-6 text-sm font-semibold shadow-sm transition-all active:scale-[0.97] sm:rounded-l-none ${
+                submitted
+                  ? "bg-emerald-500 text-white"
+                  : "bg-amber-500 text-gray-900 hover:bg-amber-400"
+              }`}
             >
-              {submitted ? "Subscribed!" : "Notify me"}
+              {submitted ? (
+                <>
+                  <Check className="h-4 w-4" />
+                  <span className="hidden sm:inline">Subscribed!</span>
+                </>
+              ) : (
+                <>
+                  <Send className="h-4 w-4" />
+                  <span className="hidden sm:inline">Subscribe</span>
+                </>
+              )}
             </button>
           </form>
         </div>
