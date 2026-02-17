@@ -1,16 +1,26 @@
 /**
  * Shopify Storefront API client.
  * @see https://shopify.dev/docs/api/storefront/latest
+ * @see https://shopify.dev/api/usage/authentication#access-tokens-for-the-storefront-api
  *
- * - Supports token-based auth (X-Shopify-Storefront-Access-Token).
- * - If the request returns 401, retries without token (tokenless access).
- *   Products/Collections work without a token per Shopify docs.
+ * - Private token (shpat_...): gebruik Shopify-Storefront-Private-Token header
+ * - Public token: gebruik X-Shopify-Storefront-Access-Token header
  */
 
 const SHOPIFY_STOREFRONT_API_URL =
   process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_API_URL ?? "";
 const SHOPIFY_STOREFRONT_ACCESS_TOKEN =
   process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN ?? "";
+
+function getTokenHeader(): Record<string, string> {
+  if (!SHOPIFY_STOREFRONT_ACCESS_TOKEN) return {};
+  const token = SHOPIFY_STOREFRONT_ACCESS_TOKEN;
+  // Private tokens (Headless channel) gebruiken Shopify-Storefront-Private-Token
+  if (token.startsWith("shpat_")) {
+    return { "Shopify-Storefront-Private-Token": token };
+  }
+  return { "X-Shopify-Storefront-Access-Token": token };
+}
 
 export async function shopifyFetch<T>({
   query,
@@ -27,11 +37,12 @@ export async function shopifyFetch<T>({
 
   // Try with token first if we have one
   if (SHOPIFY_STOREFRONT_ACCESS_TOKEN) {
+    const tokenHeaders = getTokenHeader();
     const resWithToken = await fetch(SHOPIFY_STOREFRONT_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Shopify-Storefront-Access-Token": SHOPIFY_STOREFRONT_ACCESS_TOKEN,
+        ...tokenHeaders,
       },
       body,
       cache: "no-store",
@@ -43,12 +54,21 @@ export async function shopifyFetch<T>({
       return (jsonWithToken.data ?? {}) as T;
     }
 
+    // quantityAvailable scope missing: retry without that field (fallback)
+    const errMsg = jsonWithToken.errors?.map((e: { message: string }) => e.message).join(", ") ?? "";
+    if (
+      jsonWithToken.errors?.length &&
+      errMsg.includes("quantityAvailable") &&
+      errMsg.includes("unauthenticated_read_product_inventory")
+    ) {
+      const fallbackQuery = query.replace(/\s*quantityAvailable\s*/g, " ");
+      return shopifyFetch<T>({ query: fallbackQuery, variables });
+    }
+
     // 401: retry tokenless (Products/Collections support tokenless access)
     if (resWithToken.status !== 401) {
       if (jsonWithToken.errors?.length) {
-        throw new Error(
-          jsonWithToken.errors.map((e: { message: string }) => e.message).join(", ")
-        );
+        throw new Error(errMsg || "Shopify API error");
       }
       throw new Error(`Shopify API error: ${resWithToken.status} ${resWithToken.statusText}`);
     }
@@ -74,9 +94,15 @@ export async function shopifyFetch<T>({
   }
 
   if (json.errors?.length) {
-    throw new Error(
-      json.errors.map((e: { message: string }) => e.message).join(", ")
-    );
+    const errMsg = json.errors.map((e: { message: string }) => e.message).join(", ");
+    if (
+      errMsg.includes("quantityAvailable") &&
+      errMsg.includes("unauthenticated_read_product_inventory")
+    ) {
+      const fallbackQuery = query.replace(/\s*quantityAvailable\s*/g, " ");
+      return shopifyFetch<T>({ query: fallbackQuery, variables });
+    }
+    throw new Error(errMsg);
   }
 
   return (json.data ?? {}) as T;

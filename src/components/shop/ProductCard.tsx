@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, ShoppingCart, Check } from "lucide-react";
+import { Heart, ShoppingBag, Check, Trash2 } from "lucide-react";
 import type { ShopifyProduct } from "@/lib/shopify/types";
 import { useCart } from "@/components/cart/CartProvider";
 import { useWishlist } from "@/components/wishlist/WishlistProvider";
@@ -14,7 +14,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, showSaleBadge }: ProductCardProps) {
-  const { addLine } = useCart();
+  const { addLine, removeLine, lines } = useCart();
   const { has: hasInWishlist, toggle: toggleWishlist } = useWishlist();
   const wishlisted = hasInWishlist(product.id);
   const [addedToCart, setAddedToCart] = useState(false);
@@ -26,15 +26,29 @@ export function ProductCard({ product, showSaleBadge }: ProductCardProps) {
   const isOnSale =
     showSaleBadge || (compareAtPrice !== null && compareAtPrice > price);
 
-  const variantId = product.variants?.edges?.[0]?.node?.id;
+  const firstVariant = product.variants?.edges?.[0]?.node;
+  const variantId = firstVariant?.id;
+  const quantityAvailable = firstVariant?.quantityAvailable;
 
   const handleAddToCart = () => {
     if (variantId) {
-      addLine(variantId, 1);
+      addLine(variantId, 1, quantityAvailable ?? undefined);
       setAddedToCart(true);
       setTimeout(() => setAddedToCart(false), 1500);
     }
   };
+
+  const handleRemove = () => {
+    if (variantId) removeLine(variantId);
+  };
+
+  const inCart = variantId
+    ? lines.find((l) => l.variantId === variantId)?.quantity ?? 0
+    : 0;
+  const atMax =
+    quantityAvailable != null &&
+    quantityAvailable > 0 &&
+    inCart >= quantityAvailable;
 
   const secondImage = product.images?.edges?.[1]?.node ?? null;
 
@@ -132,28 +146,39 @@ export function ProductCard({ product, showSaleBadge }: ProductCardProps) {
           )}
         </div>
 
-        {/* Add to Cart button */}
-        <button
-          onClick={handleAddToCart}
-          disabled={!variantId}
-          className={`mt-3 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 active:scale-95 disabled:opacity-50 ${
-            addedToCart
-              ? "bg-green-600 text-white"
-              : "bg-gray-900 text-white hover:bg-primary hover:text-gray-900 [&_svg]:hover:text-gray-900"
-          }`}
-        >
-          {addedToCart ? (
-            <>
-              <Check className="h-4 w-4" />
-              Added!
-            </>
-          ) : (
-            <>
-              <ShoppingCart className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-              Add to Cart
-            </>
-          )}
-        </button>
+        {/* Add to bag / Remove button */}
+        {inCart > 0 && atMax ? (
+          <button
+            onClick={handleRemove}
+            disabled={!variantId}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-red-600 bg-red-50 transition-colors duration-200 hover:bg-red-500 hover:text-white active:scale-95 disabled:opacity-50"
+          >
+            <Trash2 className="h-4 w-4" />
+            Remove
+          </button>
+        ) : (
+          <button
+            onClick={handleAddToCart}
+            disabled={!variantId}
+            className={`mt-3 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 active:scale-95 disabled:opacity-50 ${
+              addedToCart
+                ? "bg-green-600 text-white"
+                : "bg-gray-900 text-white hover:bg-primary hover:text-gray-900 [&_svg]:hover:text-gray-900"
+            }`}
+          >
+            {addedToCart ? (
+              <>
+                <Check className="h-4 w-4" />
+                Added!
+              </>
+            ) : (
+              <>
+                <ShoppingBag className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                Add to bag
+              </>
+            )}
+          </button>
+        )}
       </div>
     </div>
   );

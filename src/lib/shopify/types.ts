@@ -39,6 +39,7 @@ export interface ShopifyProduct {
       node: {
         id: string;
         availableForSale: boolean;
+        quantityAvailable?: number | null;
       };
     }>;
   };
@@ -61,6 +62,7 @@ export interface ShopifyProductWithVariants extends ShopifyProduct {
         id: string;
         title: string;
         availableForSale: boolean;
+        quantityAvailable?: number | null;
         price: {
           amount: string;
           currencyCode: string;

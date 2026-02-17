@@ -60,15 +60,25 @@ export function CountdownHeroSection({
   const timeLeft = useCountdown(endDate);
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
+    if (!email) return;
+    setError(null);
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Subscription failed");
       setSubmitted(true);
-      setTimeout(() => {
-        setSubmitted(false);
-        setEmail("");
-      }, 2000);
+      setEmail("");
+      setTimeout(() => setSubmitted(false), 2000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
     }
   };
 
@@ -110,15 +120,6 @@ export function CountdownHeroSection({
         <div className="absolute inset-0 bg-gray-900/70" />
       )}
 
-      {/* Subtle particle effect */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-30"
-        style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)`,
-          backgroundSize: "32px 32px",
-        }}
-      />
-
       <div className="container relative mx-auto flex min-h-[400px] flex-col items-center px-4 py-16 md:min-h-[480px] md:flex-row md:flex-nowrap md:items-center md:justify-between md:gap-12 md:py-20">
         {/* Left: headline + form */}
         <div className="z-10 flex flex-1 flex-col md:max-w-md">
@@ -139,7 +140,7 @@ export function CountdownHeroSection({
                 placeholder="your@email.com"
                 required
                 disabled={submitted}
-                className="h-12 w-full rounded-lg border border-gray-600 bg-gray-800 px-4 text-sm text-white placeholder:text-gray-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 sm:rounded-r-none sm:border-r-0"
+                className="h-12 w-full rounded-lg border border-white/30 bg-white px-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 sm:rounded-r-none sm:border-r-0"
               />
             </div>
             <button
@@ -148,8 +149,9 @@ export function CountdownHeroSection({
               className={`flex h-12 shrink-0 items-center gap-2 rounded-lg px-6 text-sm font-semibold shadow-sm transition-all active:scale-[0.97] sm:rounded-l-none ${
                 submitted
                   ? "bg-emerald-500 text-white"
-                  : "bg-amber-500 text-gray-900 hover:bg-amber-400"
+                  : "text-gray-900 hover:opacity-90"
               }`}
+              style={submitted ? undefined : { backgroundColor: "#ffc105" }}
             >
               {submitted ? (
                 <>
@@ -164,6 +166,9 @@ export function CountdownHeroSection({
               )}
             </button>
           </form>
+          {error && (
+            <p className="mt-3 text-sm text-red-400">{error}</p>
+          )}
         </div>
 
         {/* Right: countdown */}

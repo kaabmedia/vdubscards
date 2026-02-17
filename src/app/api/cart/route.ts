@@ -32,6 +32,14 @@ export async function GET(request: NextRequest) {
   }
 }
 
+const MAX_CART_RETRIES = 3;
+const CART_RETRY_DELAY_MS = 300;
+
+function isCartConflictError(e: unknown): boolean {
+  const msg = e instanceof Error ? e.message : String(e);
+  return /conflict/i.test(msg) || /conflicted/i.test(msg);
+}
+
 /** POST /api/cart - Maak cart of sync regels. Body: { cartId?: string, lines: [{ variantId, quantity }] } (volledige gewenste inhoud) */
 export async function POST(request: NextRequest) {
   let body: { cartId?: string; lines: Array<{ variantId: string; quantity: number }> };
@@ -54,15 +62,37 @@ export async function POST(request: NextRequest) {
     quantity: l.quantity,
   }));
 
-  try {
-    if (!cartId) {
-      if (!cartLineInput.length) {
-        return NextResponse.json(
-          { error: "lines is verplicht bij nieuwe cart" },
-          { status: 400 }
-        );
+  let lastError: unknown;
+  for (let attempt = 0; attempt < MAX_CART_RETRIES; attempt++) {
+    try {
+      if (attempt > 0) {
+        await new Promise((r) => setTimeout(r, CART_RETRY_DELAY_MS * attempt));
       }
-      const result = await shopifyFetch<{
+      const result = await executeCartPost(cartId, linesArr, cartLineInput);
+      return NextResponse.json(result);
+    } catch (e) {
+      lastError = e;
+      if (!isCartConflictError(e) || attempt === MAX_CART_RETRIES - 1) break;
+    }
+  }
+
+  console.error("Cart POST error:", lastError);
+  return NextResponse.json(
+    { error: lastError instanceof Error ? lastError.message : "Cart actie mislukt" },
+    { status: 500 }
+  );
+}
+
+async function executeCartPost(
+  cartId: string | undefined,
+  linesArr: Array<{ variantId: string; quantity: number }>,
+  cartLineInput: Array<{ merchandiseId: string; quantity: number }>
+): Promise<{ cartId: string; checkoutUrl: string | null }> {
+  if (!cartId) {
+    if (!cartLineInput.length) {
+      throw new Error("lines is verplicht bij nieuwe cart");
+    }
+    const result = await shopifyFetch<{
         cartCreate: {
           cart: { id: string; checkoutUrl: string } | null;
           userErrors: Array<{ field: string[]; message: string }>;
@@ -71,41 +101,29 @@ export async function POST(request: NextRequest) {
         query: CREATE_CART_MUTATION,
         variables: { lines: cartLineInput },
       });
-      const create = result?.cartCreate;
-      if (create?.userErrors?.length) {
-        return NextResponse.json(
-          { error: create.userErrors.map((e) => e.message).join(", ") },
-          { status: 400 }
-        );
-      }
-      const cart = create?.cart;
-      if (!cart) {
-        return NextResponse.json(
-          { error: "Geen cart aangemaakt" },
-          { status: 500 }
-        );
-      }
-      return NextResponse.json({
-        cartId: cart.id,
-        checkoutUrl: cart.checkoutUrl,
-      });
+    const create = result?.cartCreate;
+    if (create?.userErrors?.length) {
+      throw new Error(create.userErrors.map((e) => e.message).join(", "));
     }
-
-    // Bestaande cart: haal op en sync (update bestaande regels, voeg nieuwe toe)
-    const cartData = await shopifyFetch<{ cart: CartResponse | null }>({
-      query: CART_QUERY,
-      variables: { cartId },
-    });
-    const existingCart = cartData?.cart;
-    if (!existingCart) {
-      return NextResponse.json(
-        { error: "Cart niet gevonden; maak een nieuwe aan" },
-        { status: 404 }
-      );
+    const cart = create?.cart;
+    if (!cart) {
+      throw new Error("Geen cart aangemaakt");
     }
+    return { cartId: cart.id, checkoutUrl: cart.checkoutUrl };
+  }
 
-    const existingByVariant = new Map<string, { lineId: string; quantity: number }>();
-    for (const edge of existingCart.lines.edges) {
+  // Bestaande cart: haal op en sync (update bestaande regels, voeg nieuwe toe)
+  const cartData = await shopifyFetch<{ cart: CartResponse | null }>({
+    query: CART_QUERY,
+    variables: { cartId },
+  });
+  const existingCart = cartData?.cart;
+  if (!existingCart) {
+    throw new Error("Cart niet gevonden; maak een nieuwe aan");
+  }
+
+  const existingByVariant = new Map<string, { lineId: string; quantity: number }>();
+  for (const edge of existingCart.lines.edges) {
       const node = edge.node;
       existingByVariant.set(node.merchandise.id, {
         lineId: node.id,
@@ -113,8 +131,8 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const requestedVariantIds = new Set(linesArr.map((l) => l.variantId));
-    const toUpdate: Array<{ id: string; quantity: number }> = [];
+  const requestedVariantIds = new Set(linesArr.map((l) => l.variantId));
+  const toUpdate: Array<{ id: string; quantity: number }> = [];
     const toAdd: Array<{ merchandiseId: string; quantity: number }> = [];
     const toRemove: string[] = [];
 
@@ -133,9 +151,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    let lastCheckoutUrl: string | null = existingCart.checkoutUrl;
+  let lastCheckoutUrl: string | null = existingCart.checkoutUrl;
 
-    if (toRemove.length > 0) {
+  if (toRemove.length > 0) {
       const removeResult = await shopifyFetch<{
         cartLinesRemove: {
           cart: { id: string; checkoutUrl: string | null } | null;
@@ -145,17 +163,14 @@ export async function POST(request: NextRequest) {
         query: CART_LINES_REMOVE_MUTATION,
         variables: { cartId, lineIds: toRemove },
       });
-      const rem = removeResult?.cartLinesRemove;
-      if (rem?.userErrors?.length) {
-        return NextResponse.json(
-          { error: rem.userErrors.map((e: { message: string }) => e.message).join(", ") },
-          { status: 400 }
-        );
-      }
-      if (rem?.cart?.checkoutUrl) lastCheckoutUrl = rem.cart.checkoutUrl;
+    const rem = removeResult?.cartLinesRemove;
+    if (rem?.userErrors?.length) {
+      throw new Error(rem.userErrors.map((e: { message: string }) => e.message).join(", "));
     }
+    if (rem?.cart?.checkoutUrl) lastCheckoutUrl = rem.cart.checkoutUrl;
+  }
 
-    if (toUpdate.length > 0) {
+  if (toUpdate.length > 0) {
       const updateResult = await shopifyFetch<{
         cartLinesUpdate: {
           cart: { id: string; checkoutUrl: string | null } | null;
@@ -170,15 +185,12 @@ export async function POST(request: NextRequest) {
       });
       const upd = updateResult?.cartLinesUpdate;
       if (upd?.userErrors?.length) {
-        return NextResponse.json(
-          { error: upd.userErrors.map((e) => e.message).join(", ") },
-          { status: 400 }
-        );
+        throw new Error(upd.userErrors.map((e: { message: string }) => e.message).join(", "));
       }
       if (upd?.cart?.checkoutUrl) lastCheckoutUrl = upd.cart.checkoutUrl;
     }
 
-    if (toAdd.length > 0) {
+  if (toAdd.length > 0) {
       const addResult = await shopifyFetch<{
         cartLinesAdd: {
           cart: { id: string; checkoutUrl: string | null } | null;
@@ -192,26 +204,13 @@ export async function POST(request: NextRequest) {
         },
       });
       const add = addResult?.cartLinesAdd;
-      if (add?.userErrors?.length) {
-        return NextResponse.json(
-          { error: add.userErrors.map((e) => e.message).join(", ") },
-          { status: 400 }
-        );
-      }
-      if (add?.cart?.checkoutUrl) lastCheckoutUrl = add.cart.checkoutUrl;
+    if (add?.userErrors?.length) {
+      throw new Error(add.userErrors.map((e: { message: string }) => e.message).join(", "));
     }
-
-    return NextResponse.json({
-      cartId,
-      checkoutUrl: lastCheckoutUrl,
-    });
-  } catch (e) {
-    console.error("Cart POST error:", e);
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Cart actie mislukt" },
-      { status: 500 }
-    );
+    if (add?.cart?.checkoutUrl) lastCheckoutUrl = add.cart.checkoutUrl;
   }
+
+  return { cartId, checkoutUrl: lastCheckoutUrl };
 }
 
 interface CartResponse {

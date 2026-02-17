@@ -43,6 +43,7 @@ export const PRODUCTS_QUERY = `
               node {
                 id
                 availableForSale
+                quantityAvailable
               }
             }
           }
@@ -105,6 +106,7 @@ export const PRODUCTS_BY_COLLECTION_QUERY = `
                 node {
                   id
                   availableForSale
+                  quantityAvailable
                 }
               }
             }
@@ -171,6 +173,7 @@ export const COLLECTION_PAGE_QUERY = `
                 node {
                   id
                   availableForSale
+                  quantityAvailable
                 }
               }
             }
@@ -281,6 +284,7 @@ export const PRODUCT_BY_HANDLE_QUERY = `
             id
             title
             availableForSale
+            quantityAvailable
             price {
               amount
               currencyCode
@@ -339,6 +343,7 @@ export const PRODUCTS_BY_IDS_QUERY = `
             node {
               id
               availableForSale
+              quantityAvailable
             }
           }
         }
@@ -423,6 +428,7 @@ export const SEARCH_PAGE_QUERY = `
               node {
                 id
                 availableForSale
+                quantityAvailable
               }
             }
           }
@@ -522,6 +528,7 @@ export const CART_QUERY = `
               ... on ProductVariant {
                 id
                 title
+                quantityAvailable
                 image {
                   url
                   altText

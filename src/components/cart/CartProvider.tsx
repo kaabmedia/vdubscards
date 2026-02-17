@@ -18,7 +18,7 @@ export interface CartLine {
 
 interface CartContextValue {
   lines: CartLine[];
-  addLine: (variantId: string, quantity?: number) => void;
+  addLine: (variantId: string, quantity?: number, maxQuantity?: number | null) => void;
   removeLine: (variantId: string) => void;
   updateQuantity: (variantId: string, quantity: number) => void;
   checkoutUrl: string | null;
@@ -95,16 +95,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [lines, cartId]);
 
-  const addLine = useCallback((variantId: string, quantity = 1) => {
-    setLines((prev) => {
-      const existing = prev.find((l) => l.variantId === variantId);
-      const next = existing
-        ? prev.map((l) =>
-            l.variantId === variantId
-              ? { ...l, quantity: l.quantity + quantity }
-              : l
-          )
-        : [...prev, { variantId, quantity }];
+  const addLine = useCallback(
+    (variantId: string, quantity = 1, maxQuantity?: number | null) => {
+      setLines((prev) => {
+        const existing = prev.find((l) => l.variantId === variantId);
+        const currentQty = existing?.quantity ?? 0;
+        const addQty = Math.max(0, quantity);
+        let newQty = currentQty + addQty;
+        if (maxQuantity != null && maxQuantity >= 0) {
+          newQty = Math.min(newQty, maxQuantity);
+        }
+        if (newQty <= 0) return prev;
+        const next = existing
+          ? prev.map((l) =>
+              l.variantId === variantId ? { ...l, quantity: newQty } : l
+            )
+          : [...prev, { variantId, quantity: newQty }];
       // Sync naar Shopify na state-update (fire-and-forget)
       queueMicrotask(() => {
         fetch("/api/cart", {

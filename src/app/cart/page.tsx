@@ -15,6 +15,7 @@ import {
   Truck,
   RotateCcw,
 } from "lucide-react";
+import { NewsletterSection } from "@/components/home/NewsletterSection";
 
 interface CartLineNode {
   id: string;
@@ -22,6 +23,7 @@ interface CartLineNode {
   merchandise: {
     id: string;
     title: string;
+    quantityAvailable?: number | null;
     image: {
       url: string;
       altText: string | null;
@@ -95,9 +97,15 @@ export default function CartPage() {
     0
   );
 
-  const handleUpdateQuantity = async (variantId: string, newQty: number) => {
+  const handleUpdateQuantity = async (
+    variantId: string,
+    newQty: number,
+    maxQty?: number | null
+  ) => {
     setUpdatingLines((prev) => new Set(prev).add(variantId));
-    if (newQty <= 0) {
+    const cappedQty =
+      maxQty != null && maxQty > 0 ? Math.min(newQty, maxQty) : newQty;
+    if (cappedQty <= 0) {
       removeLine(variantId);
       setCart((prev) => {
         if (!prev) return prev;
@@ -111,7 +119,7 @@ export default function CartPage() {
         };
       });
     } else {
-      updateQuantity(variantId, newQty);
+      updateQuantity(variantId, cappedQty);
       setCart((prev) => {
         if (!prev) return prev;
         return {
@@ -119,7 +127,7 @@ export default function CartPage() {
           lines: {
             edges: prev.lines.edges.map((e) =>
               e.node.merchandise.id === variantId
-                ? { node: { ...e.node, quantity: newQty } }
+                ? { node: { ...e.node, quantity: cappedQty } }
                 : e
             ),
           },
@@ -137,72 +145,82 @@ export default function CartPage() {
   };
 
   const handleRemove = (variantId: string) => {
-    handleUpdateQuantity(variantId, 0);
+    handleUpdateQuantity(variantId, 0, undefined);
   };
 
   // Loading state
   if (loading && !cart) {
     return (
-      <div className="container mx-auto px-4 py-16">
-        <div className="flex flex-col items-center justify-center gap-4 py-20">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">Loading cart...</p>
+      <>
+        <div className="container mx-auto px-4 py-16">
+          <div className="flex flex-col items-center justify-center gap-4 py-20">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">Loading cart...</p>
+          </div>
         </div>
-      </div>
+        <NewsletterSection />
+      </>
     );
   }
 
   // Error state
   if (error) {
     return (
-      <div className="container mx-auto px-4 py-16">
-        <h1 className="mb-6 text-2xl font-bold tracking-tight">Shopping cart</h1>
-        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center">
-          <p className="text-sm text-destructive">{error}</p>
-          <Link
-            href="/collections/all"
-            className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-foreground underline underline-offset-2"
-          >
-            View products
-          </Link>
+      <>
+        <div className="container mx-auto px-4 py-16">
+          <h1 className="mb-6 text-2xl font-bold tracking-tight">Shopping cart</h1>
+          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-6 text-center">
+            <p className="text-sm text-destructive">{error}</p>
+            <Link
+              href="/collections/all"
+              className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-foreground underline underline-offset-2"
+            >
+              View products
+            </Link>
+          </div>
         </div>
-      </div>
+        <NewsletterSection />
+      </>
     );
   }
 
   // Empty state
   if (isEmpty) {
     return (
-      <div className="container mx-auto px-4 py-16">
-        <h1 className="mb-6 text-2xl font-bold tracking-tight">Shopping cart</h1>
-        <div className="flex flex-col items-center gap-6 py-16">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted">
-            <ShoppingBag className="h-8 w-8 text-muted-foreground" />
+      <>
+        <div className="container mx-auto px-4 py-16">
+          <h1 className="mb-6 text-2xl font-bold tracking-tight">Shopping cart</h1>
+          <div className="flex flex-col items-center gap-6 py-16">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+              <ShoppingBag className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-medium text-foreground">
+                Your cart is empty
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Discover our collection and add products.
+              </p>
+            </div>
+            <Link
+              href="/collections/all"
+              className="inline-flex items-center gap-2 rounded-lg bg-foreground px-6 py-2.5 text-sm font-semibold text-background transition-colors hover:bg-foreground/90"
+            >
+              View products
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
-          <div className="text-center">
-            <p className="text-lg font-medium text-foreground">
-              Your cart is empty
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Discover our collection and add products.
-            </p>
-          </div>
-          <Link
-            href="/collections/all"
-            className="inline-flex items-center gap-2 rounded-lg bg-foreground px-6 py-2.5 text-sm font-semibold text-background transition-colors hover:bg-foreground/90"
-          >
-            View products
-            <ArrowRight className="h-4 w-4" />
-          </Link>
         </div>
-      </div>
+        <NewsletterSection />
+      </>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 md:py-12">
-      <h1 className="mb-8 text-2xl font-bold tracking-tight md:text-3xl">
-        Shopping cart
+    <>
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        <h1 className="mb-8 text-2xl font-bold tracking-tight md:text-3xl">
+          Shopping cart
         <span className="ml-2 text-base font-normal text-muted-foreground">
           ({cartLines.length} {cartLines.length === 1 ? "item" : "items"})
         </span>
@@ -279,7 +297,8 @@ export default function CartPage() {
                             onClick={() =>
                               handleUpdateQuantity(
                                 line.merchandise.id,
-                                line.quantity - 1
+                                line.quantity - 1,
+                                line.merchandise.quantityAvailable
                               )
                             }
                             disabled={isUpdating}
@@ -296,10 +315,15 @@ export default function CartPage() {
                             onClick={() =>
                               handleUpdateQuantity(
                                 line.merchandise.id,
-                                line.quantity + 1
+                                line.quantity + 1,
+                                line.merchandise.quantityAvailable
                               )
                             }
-                            disabled={isUpdating}
+                            disabled={
+                              isUpdating ||
+                              (line.merchandise.quantityAvailable != null &&
+                                line.quantity >= line.merchandise.quantityAvailable)
+                            }
                             className="flex h-8 w-8 items-center justify-center text-muted-foreground transition-colors hover:text-foreground disabled:opacity-30"
                             aria-label="Increase quantity"
                           >
@@ -330,7 +354,8 @@ export default function CartPage() {
                         onClick={() =>
                           handleUpdateQuantity(
                             line.merchandise.id,
-                            line.quantity - 1
+                            line.quantity - 1,
+                            line.merchandise.quantityAvailable
                           )
                         }
                         disabled={isUpdating}
@@ -347,10 +372,15 @@ export default function CartPage() {
                         onClick={() =>
                           handleUpdateQuantity(
                             line.merchandise.id,
-                            line.quantity + 1
+                            line.quantity + 1,
+                            line.merchandise.quantityAvailable
                           )
                         }
-                        disabled={isUpdating}
+                        disabled={
+                          isUpdating ||
+                          (line.merchandise.quantityAvailable != null &&
+                            line.quantity >= line.merchandise.quantityAvailable)
+                        }
                         className="flex h-9 w-9 items-center justify-center text-muted-foreground transition-colors hover:text-foreground disabled:opacity-30"
                         aria-label="Increase quantity"
                       >
@@ -458,10 +488,18 @@ export default function CartPage() {
                 <RotateCcw className="h-4 w-4 shrink-0" />
                 <span>14-day return policy</span>
               </div>
+              <Link
+                href="/checkout/failed"
+                className="block text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+              >
+                Payment failed? Get help
+              </Link>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <NewsletterSection />
+    </>
   );
 }

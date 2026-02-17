@@ -224,6 +224,7 @@ export default async function ProductPage({
                 <AddToCartButton
                   variantId={firstVariant.id}
                   available={firstVariant.availableForSale}
+                  quantityAvailable={firstVariant.quantityAvailable}
                 />
               )}
             </div>

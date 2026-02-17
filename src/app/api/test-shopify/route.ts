@@ -22,13 +22,19 @@ export async function GET() {
   const apiUrl = url;
   const body = JSON.stringify({ query: PRODUCTS_QUERY, variables: { first: 5 } });
 
+  function getHeaders(withToken: boolean): Record<string, string> {
+    const h: Record<string, string> = { "Content-Type": "application/json" };
+    if (withToken && token?.startsWith("shpat_")) {
+      h["Shopify-Storefront-Private-Token"] = token;
+    } else if (withToken && token) {
+      h["X-Shopify-Storefront-Access-Token"] = token;
+    }
+    return h;
+  }
   async function doFetch(withToken: boolean) {
     return fetch(apiUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(withToken && token ? { "X-Shopify-Storefront-Access-Token": token } : {}),
-      },
+      headers: getHeaders(withToken),
       body,
       cache: "no-store",
     });

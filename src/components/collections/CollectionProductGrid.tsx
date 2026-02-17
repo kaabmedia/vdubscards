@@ -197,61 +197,65 @@ export function CollectionProductGrid({
 
   // --- Pagination ---
 
-  const fetchPage = async (cursor: string | null) => {
-    const params = buildParams();
-    if (cursor) params.set("after", cursor);
-    const res = await fetch(
-      `/api/collections/${handle}/products?${params.toString()}`
-    );
-    return res.json();
-  };
+  const fetchPage = useCallback(
+    async (cursor: string | null, directPage?: number) => {
+      const params = buildParams();
+      if (cursor) params.set("after", cursor);
+      if (directPage != null && directPage > 1) params.set("page", String(directPage));
+      const res = await fetch(
+        `/api/collections/${handle}/products?${params.toString()}`
+      );
+      return res.json();
+    },
+    [buildParams, handle]
+  );
+
+  const prefetchPage = useCallback(
+    (targetPage: number) => {
+      if (targetPage === page || targetPage < 1 || navigating) return;
+      const cursorIndex = targetPage - 1;
+      if (cursorIndex < cursorHistory.length) {
+        fetchPage(cursorHistory[cursorIndex]);
+      } else {
+        fetchPage(null, targetPage);
+      }
+    },
+    [page, navigating, cursorHistory, fetchPage]
+  );
 
   const goToPage = async (targetPage: number) => {
     if (targetPage === page || navigating || targetPage < 1) return;
     setNavigating(true);
     try {
       const cursorIndex = targetPage - 1;
-      let cursor: string | null = null;
+      let data: { products?: ShopifyProduct[]; pageInfo?: { endCursor?: string | null; hasNextPage?: boolean } };
 
       if (cursorIndex < cursorHistory.length) {
-        cursor = cursorHistory[cursorIndex];
+        data = await fetchPage(cursorHistory[cursorIndex]);
       } else {
-        let lastKnownCursor = endCursorHistory[endCursorHistory.length - 1];
-        const newCursorHistory = [...cursorHistory];
-        const newEndCursorHistory = [...endCursorHistory];
-
-        for (let p = cursorHistory.length; p <= cursorIndex; p++) {
-          if (!lastKnownCursor) break;
-          newCursorHistory.push(lastKnownCursor);
-          const data = await fetchPage(lastKnownCursor);
-          if (!data.products?.length) break;
-          lastKnownCursor = data.pageInfo?.endCursor ?? null;
-          newEndCursorHistory.push(lastKnownCursor);
-          if (data.pageInfo?.hasNextPage && p + 2 > maxDiscoveredPage) {
-            setMaxDiscoveredPage(p + 2);
-          }
-        }
-
-        setCursorHistory(newCursorHistory);
-        setEndCursorHistory(newEndCursorHistory);
-        cursor = newCursorHistory[cursorIndex] ?? null;
+        data = await fetchPage(null, targetPage);
       }
-
-      const data = await fetchPage(cursor);
       if (data.products?.length) {
         setProducts(data.products);
         setEndCursor(data.pageInfo?.endCursor ?? null);
         setHasNextPage(data.pageInfo?.hasNextPage ?? false);
         setPage(targetPage);
 
-        if (targetPage <= cursorHistory.length) {
+        if (cursorIndex < cursorHistory.length) {
           setCursorHistory((prev) => prev.slice(0, targetPage));
+          setEndCursorHistory((prev) => {
+            const updated = [...prev];
+            updated[targetPage - 1] = data.pageInfo?.endCursor ?? null;
+            return updated;
+          });
+        } else {
+          setCursorHistory([null]);
+          setEndCursorHistory(
+            Array.from({ length: targetPage }, (_, i) =>
+              i === targetPage - 1 ? (data.pageInfo?.endCursor ?? null) : null
+            )
+          );
         }
-        setEndCursorHistory((prev) => {
-          const updated = [...prev];
-          updated[targetPage - 1] = data.pageInfo?.endCursor ?? null;
-          return updated;
-        });
 
         if (data.pageInfo?.hasNextPage && targetPage + 1 > maxDiscoveredPage) {
           setMaxDiscoveredPage(targetPage + 1);
@@ -696,6 +700,7 @@ export function CollectionProductGrid({
               <button
                 type="button"
                 onClick={handlePrevPage}
+                onMouseEnter={() => prefetchPage(page - 1)}
                 disabled={page <= 1 || navigating}
                 className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-sm transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-30"
                 aria-label="Previous page"
@@ -716,6 +721,7 @@ export function CollectionProductGrid({
                     key={p}
                     type="button"
                     onClick={() => goToPage(p)}
+                    onMouseEnter={() => prefetchPage(p)}
                     disabled={navigating}
                     className={`inline-flex h-9 w-9 items-center justify-center rounded-lg text-sm font-medium transition-colors ${
                       p === page
@@ -731,6 +737,7 @@ export function CollectionProductGrid({
               <button
                 type="button"
                 onClick={handleNextPage}
+                onMouseEnter={() => prefetchPage(page + 1)}
                 disabled={!hasNextPage || navigating}
                 className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-sm transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-30"
                 aria-label="Next page"

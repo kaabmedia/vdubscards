@@ -6,15 +6,25 @@ import { Send, Check, Mail } from "lucide-react";
 export function NewsletterSection() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
+    if (!email) return;
+    setError(null);
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Subscription failed");
       setSubmitted(true);
-      setTimeout(() => {
-        setSubmitted(false);
-        setEmail("");
-      }, 2000);
+      setEmail("");
+      setTimeout(() => setSubmitted(false), 2000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
     }
   };
 
@@ -50,7 +60,7 @@ export function NewsletterSection() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
                 required
-                className="h-12 w-full rounded-lg border border-gray-600 bg-gray-800 px-4 text-sm text-white placeholder:text-gray-500 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 sm:rounded-r-none sm:border-r-0"
+                className="h-12 w-full rounded-lg border border-white/30 bg-white px-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 sm:rounded-r-none sm:border-r-0"
               />
             </div>
             <button
@@ -59,8 +69,9 @@ export function NewsletterSection() {
               className={`flex h-12 shrink-0 items-center gap-2 rounded-lg px-6 text-sm font-semibold shadow-sm transition-all active:scale-[0.97] sm:rounded-l-none ${
                 submitted
                   ? "bg-emerald-500 text-white"
-                  : "bg-amber-500 text-gray-900 hover:bg-amber-400"
+                  : "text-gray-900 hover:opacity-90"
               }`}
+              style={submitted ? undefined : { backgroundColor: "#ffc105" }}
             >
               {submitted ? (
                 <>
@@ -75,6 +86,9 @@ export function NewsletterSection() {
               )}
             </button>
           </form>
+          {error && (
+            <p className="mt-3 text-sm text-red-400">{error}</p>
+          )}
 
           <p className="mt-4 text-xs text-gray-500">
             No spam, unsubscribe anytime.
