@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Send, Check, Mail } from "lucide-react";
+import { fireConfetti } from "@/lib/confetti";
 
 export function NewsletterSection() {
   const [email, setEmail] = useState("");
@@ -20,9 +21,9 @@ export function NewsletterSection() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Subscription failed");
+      fireConfetti();
       setSubmitted(true);
       setEmail("");
-      setTimeout(() => setSubmitted(false), 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     }

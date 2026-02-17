@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Send, Check } from "lucide-react";
+import { fireConfetti } from "@/lib/confetti";
 
 interface CountdownHeroSectionProps {
   endDate: string;
@@ -74,9 +75,9 @@ export function CountdownHeroSection({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Subscription failed");
+      fireConfetti();
       setSubmitted(true);
       setEmail("");
-      setTimeout(() => setSubmitted(false), 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     }
