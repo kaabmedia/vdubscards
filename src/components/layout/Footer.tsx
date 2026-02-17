@@ -1,9 +1,6 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
-import { Instagram, Facebook, Mail, Phone, Send, Check } from "lucide-react";
+import { Instagram, Facebook, Mail, Phone } from "lucide-react";
 
 const shopLinks = [
   { href: "/collections/all", label: "All Products" },
@@ -25,30 +22,6 @@ const companyLinks = [
 ];
 
 export function Footer() {
-  const [footerEmail, setFooterEmail] = useState("");
-  const [footerSubmitted, setFooterSubmitted] = useState(false);
-  const [footerError, setFooterError] = useState<string | null>(null);
-
-  const handleFooterNewsletterSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!footerEmail) return;
-    setFooterError(null);
-    try {
-      const res = await fetch("/api/newsletter", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: footerEmail }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Subscription failed");
-      setFooterSubmitted(true);
-      setFooterEmail("");
-      setTimeout(() => setFooterSubmitted(false), 2000);
-    } catch (err) {
-      setFooterError(err instanceof Error ? err.message : "Something went wrong");
-    }
-  };
-
   return (
     <footer className="border-t border-gray-200 bg-white">
       <div className="container mx-auto px-4 py-12 md:py-16">
@@ -69,45 +42,6 @@ export function Footer() {
               <br />
               Curated with care for fans and collectors.
             </p>
-            {/* Newsletter signup */}
-            <div className="mt-5">
-              <p className="text-xs font-medium text-gray-700">
-                Stay updated
-              </p>
-              <form
-                onSubmit={handleFooterNewsletterSubmit}
-                className="mt-2 flex gap-2"
-              >
-                <input
-                  type="email"
-                  value={footerEmail}
-                  onChange={(e) => setFooterEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  required
-                  className="h-9 flex-1 rounded border border-gray-200 px-3 text-xs text-gray-900 placeholder:text-gray-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500/30"
-                />
-                <button
-                  type="submit"
-                  disabled={footerSubmitted}
-                  className="flex h-9 shrink-0 items-center gap-1 rounded border border-amber-500 bg-amber-500 px-3 text-xs font-medium text-gray-900 transition-colors hover:bg-amber-400 disabled:bg-emerald-500 disabled:text-white disabled:border-emerald-500"
-                >
-                  {footerSubmitted ? (
-                    <>
-                      <Check className="h-3 w-3" />
-                      Done
-                    </>
-                  ) : (
-                    <>
-                      <Send className="h-3 w-3" />
-                      Subscribe
-                    </>
-                  )}
-                </button>
-              </form>
-              {footerError && (
-                <p className="mt-1 text-xs text-red-500">{footerError}</p>
-              )}
-            </div>
             <div className="mt-5 flex items-center gap-1.5">
               <a
                 href="https://www.instagram.com/vdubs.sportscards/"
@@ -212,17 +146,29 @@ export function Footer() {
             &copy; {new Date().getFullYear()} V-Dub&apos;s Cards. All rights
             reserved.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-1.5">
-            {["VISA", "Mastercard", "Bancontact", "KBC", "iDEAL", "EPS", "PayPal"].map(
-              (name) => (
-                <span
-                  key={name}
-                  className="rounded border border-gray-200 bg-gray-50 px-2 py-0.5 text-[10px] font-medium text-gray-500"
-                >
-                  {name}
-                </span>
-              )
-            )}
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {[
+              { src: "/betaalmethoden/visa.svg", alt: "Visa" },
+              { src: "/betaalmethoden/mastercard.svg", alt: "Mastercard" },
+              { src: "/betaalmethoden/paypal.svg", alt: "PayPal" },
+              { src: "/betaalmethoden/Bancontact_logo.svg.png", alt: "Bancontact" },
+              { src: "/betaalmethoden/ideal-logo-1024.png", alt: "iDEAL" },
+              { src: "/betaalmethoden/eps-logo-color.png", alt: "EPS" },
+              { src: "/betaalmethoden/klarna.svg", alt: "Klarna" },
+            ].map(({ src, alt }) => (
+              <div
+                key={alt}
+                className="flex h-7 w-12 items-center justify-center rounded border border-gray-200 bg-white px-1.5 py-1"
+              >
+                <Image
+                  src={src}
+                  alt={alt}
+                  width={40}
+                  height={24}
+                  className="h-5 w-full object-contain opacity-80"
+                />
+              </div>
+            ))}
           </div>
         </div>
       </div>
