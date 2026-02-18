@@ -57,8 +57,8 @@ export default function WishlistPage() {
     return (
       <>
         <div className="container mx-auto px-4 py-12">
-          <h1 className="text-2xl font-semibold mb-6">Mijn wishlist</h1>
-          <p className="text-muted-foreground">Laden...</p>
+          <h1 className="text-2xl font-semibold mb-6">My wishlist</h1>
+          <p className="text-muted-foreground">Loading...</p>
         </div>
         <NewsletterSection />
       </>
@@ -69,12 +69,12 @@ export default function WishlistPage() {
     return (
       <>
         <div className="container mx-auto px-4 py-12">
-          <h1 className="text-2xl font-semibold mb-6">Mijn wishlist</h1>
+          <h1 className="text-2xl font-semibold mb-6">My wishlist</h1>
           <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-muted/30 py-16 text-center">
             <Heart className="h-16 w-16 text-purple/50 mb-4" />
-            <p className="text-muted-foreground mb-4">Je wishlist is leeg.</p>
+            <p className="text-muted-foreground mb-4">Your wishlist is empty.</p>
             <Button asChild>
-              <Link href="/collections/all">Naar shop</Link>
+              <Link href="/collections/all">Shop now</Link>
             </Button>
           </div>
         </div>
@@ -87,9 +87,9 @@ export default function WishlistPage() {
     <>
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-2xl font-semibold mb-6">
-          Mijn wishlist ({products.length})
+          My wishlist ({products.length})
         </h1>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

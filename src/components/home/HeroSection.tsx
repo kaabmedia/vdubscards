@@ -34,13 +34,14 @@ export function HeroSection({ floatingCards = [] }: HeroSectionProps) {
       {/* Eagle mascot – bottom center, fully inside hero */}
       <div
         className="pointer-events-none absolute bottom-0 left-1/2 z-[50] flex justify-center animate-mascot-pop"
-        style={{ marginLeft: -104, marginTop: -20, marginBottom: -20, transform: "translateX(-50%) translateY(-40px)" }}
+        style={{ marginLeft: -80, marginTop: -20, marginBottom: -20, transform: "translateX(-50%) translateY(-40px)" }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/mascot-eagle.png"
           alt=""
-          className="block h-auto w-40 md:w-52"
+          className="block h-auto"
+          style={{ width: "160px" }}
         />
       </div>
     </section>

@@ -11,9 +11,7 @@ import {
   ChevronRight,
   Menu,
   X,
-  User,
 } from "lucide-react";
-import { SHOPIFY_ACCOUNT_URL } from "@/lib/shopify/config";
 import { useCart } from "@/components/cart/CartProvider";
 import { useWishlist } from "@/components/wishlist/WishlistProvider";
 import type { NavLink } from "@/lib/shopify/menu";
@@ -293,18 +291,6 @@ export function Header({ menuItems = [] }: HeaderProps) {
             />
           </form>
 
-          {/* Account */}
-          {SHOPIFY_ACCOUNT_URL && (
-            <Link
-              href={SHOPIFY_ACCOUNT_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-full p-2 text-foreground transition-all duration-200 hover:scale-110 hover:bg-muted hover:text-purple active:scale-95"
-              aria-label="Account"
-            >
-              <User className="h-5 w-5" />
-            </Link>
-          )}
           {/* Wishlist */}
           <Link
             href="/wishlist"
@@ -354,19 +340,6 @@ export function Header({ menuItems = [] }: HeaderProps) {
               depth={0}
             />
           ))}
-          {/* Mobile account */}
-          {SHOPIFY_ACCOUNT_URL && (
-            <Link
-              href={SHOPIFY_ACCOUNT_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2 flex items-center gap-2 rounded-lg py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
-              onClick={() => setMobileOpen(false)}
-            >
-              <User className="h-4 w-4" />
-              Account
-            </Link>
-          )}
           {/* Mobile search */}
           <form
             action="/search"

@@ -132,33 +132,33 @@ export default async function ProductPage({
     <div className="bg-gray-50">
       <div className="container mx-auto px-4 py-6 md:py-10">
         {/* Breadcrumb */}
-        <nav className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-foreground transition-colors">
+        <nav className="mb-6 flex min-w-0 flex-nowrap items-center gap-1.5 overflow-hidden text-sm text-muted-foreground">
+          <Link href="/" className="shrink-0 hover:text-foreground transition-colors">
             Home
           </Link>
-          <span>/</span>
+          <span className="shrink-0">/</span>
           {primaryCollection ? (
             <>
               <Link
                 href={`/collections/${primaryCollection.handle}`}
-                className="hover:text-foreground transition-colors"
+                className="min-w-0 truncate hover:text-foreground transition-colors"
               >
                 {primaryCollection.title}
               </Link>
-              <span>/</span>
+              <span className="shrink-0">/</span>
             </>
           ) : (
             <>
               <Link
                 href="/collections/all"
-                className="hover:text-foreground transition-colors"
+                className="shrink-0 hover:text-foreground transition-colors"
               >
                 Products
               </Link>
-              <span>/</span>
+              <span className="shrink-0">/</span>
             </>
           )}
-          <span className="truncate text-foreground">{product.title}</span>
+          <span className="min-w-0 truncate text-foreground">{product.title}</span>
         </nav>
 
         {/* Product section */}
