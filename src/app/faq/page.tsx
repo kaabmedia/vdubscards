@@ -7,7 +7,6 @@ import {
   CheckCircle,
   HelpCircle,
   Mail,
-  Phone,
 } from "lucide-react";
 import type { Metadata } from "next";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
@@ -125,18 +124,15 @@ export default function FAQPage() {
           </div>
           <div className="rounded-lg border border-gray-200 bg-white p-5">
             <div className="flex items-start gap-3">
-              <Phone className="mt-0.5 h-5 w-5 shrink-0 text-gray-600" />
+              <HelpCircle className="mt-0.5 h-5 w-5 shrink-0 text-gray-600" />
               <div>
-                <h2 className="font-bold text-gray-900">Call us</h2>
+                <h2 className="font-bold text-gray-900">Need more help?</h2>
                 <p className="mt-2 text-sm text-gray-600">
-                  Prefer to talk to a person? Call{" "}
-                  <a
-                    href="tel:+31684386100"
-                    className="font-medium text-primary hover:underline"
-                  >
-                    +31 6 84 38 61 00
-                  </a>{" "}
-                  and we will help you right away.
+                  For extra support, visit our{" "}
+                  <Link href="/contact" className="font-medium text-primary hover:underline">
+                    contact page
+                  </Link>{" "}
+                  and we will get back to you quickly.
                 </p>
               </div>
             </div>

@@ -2,10 +2,26 @@ import Link from "next/link";
 import Image from "next/image";
 
 const HERO_CARD_POSITIONS = [
-  { className: "rotate-[-8deg] shrink-0", opacity: "opacity-90" },
-  { className: "rotate-[5deg] shrink-0", opacity: "opacity-85" },
-  { className: "rotate-[8deg] shrink-0", opacity: "opacity-90" },
-  { className: "rotate-[-5deg] shrink-0", opacity: "opacity-85" },
+  {
+    className: "rotate-[-8deg] shrink-0",
+    opacity: "opacity-90",
+    floatClass: "motion-safe:animate-hero-float-slow",
+  },
+  {
+    className: "rotate-[5deg] shrink-0",
+    opacity: "opacity-85",
+    floatClass: "motion-safe:animate-hero-float-reverse",
+  },
+  {
+    className: "rotate-[8deg] shrink-0",
+    opacity: "opacity-90",
+    floatClass: "motion-safe:animate-hero-float-medium",
+  },
+  {
+    className: "rotate-[-5deg] shrink-0",
+    opacity: "opacity-85",
+    floatClass: "motion-safe:animate-hero-float-reverse-slow",
+  },
 ] as const;
 
 export interface FloatingCard {
@@ -21,9 +37,9 @@ interface HeroFloatingCardsProps {
 }
 
 function CardSlot({ index, card, theme }: { index: number; card: FloatingCard; theme: "light" | "dark" }) {
-  const { className, opacity } = HERO_CARD_POSITIONS[index];
+  const { className, opacity, floatClass } = HERO_CARD_POSITIONS[index];
   const opacityClass = theme === "dark" ? "opacity-40" : opacity;
-  const wrapperClass = `block relative w-36 h-48 md:w-48 md:h-64 shrink-0 ${className} ${opacityClass} overflow-hidden rounded-lg shadow-lg transition-all duration-300 ease-out hover:scale-105 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/25 hover:z-50 hover:opacity-100 ${card.href ? "cursor-pointer pointer-events-auto" : "cursor-default pointer-events-auto"}`;
+  const wrapperClass = `block relative w-36 h-48 md:w-48 md:h-64 shrink-0 ${className} ${opacityClass} ${floatClass} will-change-transform overflow-hidden rounded-lg shadow-lg transition-all duration-300 ease-out hover:scale-105 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/25 hover:z-50 hover:opacity-100 ${card.href ? "cursor-pointer pointer-events-auto" : "cursor-default pointer-events-auto"}`;
   const content = (
     <Image
       src={card.url}
@@ -64,10 +80,12 @@ function PlaceholderSlot({
   index: number;
   theme: "light" | "dark";
 }) {
-  const { className, opacity } = HERO_CARD_POSITIONS[index];
+  const { className, opacity, floatClass } = HERO_CARD_POSITIONS[index];
   const gradient = theme === "dark" ? DARK_GRADIENTS[index] : LIGHT_GRADIENTS[index];
   return (
-    <div className={`w-36 h-48 md:w-48 md:h-64 shrink-0 ${className} pointer-events-none rounded-lg bg-gradient-to-br shadow-2xl ${gradient} ${opacity}`} />
+    <div
+      className={`w-36 h-48 md:w-48 md:h-64 shrink-0 ${className} ${floatClass} pointer-events-none will-change-transform rounded-lg bg-gradient-to-br shadow-2xl ${gradient} ${opacity}`}
+    />
   );
 }
 

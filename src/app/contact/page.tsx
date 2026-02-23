@@ -1,11 +1,11 @@
-import { Mail, Phone, MessageCircle } from "lucide-react";
+import { Mail, MessageCircle } from "lucide-react";
 import type { Metadata } from "next";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
 
 export const metadata: Metadata = {
   title: "Contact us | V-Dub's Cards",
   description:
-    "Contact V-Dub's Cards. Email, phone or reach out for product questions, orders and support.",
+    "Contact V-Dub's Cards. Reach out by email for product questions, orders and support.",
 };
 
 export default function ContactPage() {
@@ -41,22 +41,6 @@ export default function ContactPage() {
             </span>
           </a>
 
-          <a
-            href="tel:+31684386100"
-            className="group flex flex-col rounded-lg border border-gray-200 bg-white p-6 transition-colors hover:border-primary/50 hover:shadow-md"
-          >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors group-hover:bg-primary/10 group-hover:text-primary">
-              <Phone className="h-5 w-5" />
-            </div>
-            <h2 className="mt-4 font-bold text-gray-900">Call us</h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Prefer to talk to someone? Call us and we will help you right away.
-            </p>
-            <span className="mt-3 font-medium text-primary group-hover:underline">
-              +31 6 84 38 61 00
-            </span>
-          </a>
-
           <div className="flex flex-col rounded-lg border border-gray-200 bg-white p-6">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600">
               <MessageCircle className="h-5 w-5" />
@@ -70,16 +54,14 @@ export default function ContactPage() {
               section for upcoming dates.
             </p>
           </div>
-        </div>
 
-        {/* Info block */}
-        <div className="mt-10 rounded-lg border border-gray-200 bg-white p-6">
-          <h2 className="font-bold text-gray-900">Response times</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            We aim to respond to all emails within 1 business day. For urgent
-            order issues, calling is often the fastest option. Our customer
-            service is available during business hours (CET).
-          </p>
+          <div className="flex flex-col rounded-lg border border-gray-200 bg-white p-6">
+            <h2 className="font-bold text-gray-900">Response times</h2>
+            <p className="mt-2 text-sm text-gray-600">
+              We aim to respond to all emails within 1 business day. Our customer
+              service is available during business hours (CET).
+            </p>
+          </div>
         </div>
       </div>
 

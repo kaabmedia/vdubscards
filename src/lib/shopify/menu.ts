@@ -30,7 +30,9 @@ const PATH_MAP: Record<string, string> = {
   "/pages/contact": "/contact",
 };
 
-function normalizeHref(href: string): string {
+function normalizeHref(href: string, label?: string): string {
+  const normalizedLabel = (label ?? "").trim().toLowerCase();
+  if (normalizedLabel === "events") return "/events";
   return PATH_MAP[href] ?? href;
 }
 
@@ -46,7 +48,7 @@ export function itemToNavLink(item: ShopifyMenuItem): NavLink | null {
           .filter((link): link is NavLink => link != null)
       : undefined;
   return {
-    href: normalizeHref(href),
+    href: normalizeHref(href, String(item.title)),
     label: String(item.title),
     children: children && children.length > 0 ? children : undefined,
   };

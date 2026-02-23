@@ -228,7 +228,7 @@ export function Header({ menuItems = [] }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-white">
-      <div className="container mx-auto flex h-16 items-center justify-between gap-4 px-4">
+      <div className="relative container mx-auto flex h-16 items-center justify-between gap-4 px-4">
         {/* Mobile menu button */}
         <button
           className="rounded-lg p-1 transition-transform active:scale-90 lg:hidden"
@@ -243,12 +243,15 @@ export function Header({ menuItems = [] }: HeaderProps) {
         </button>
 
         {/* Logo */}
-        <Link href="/" className="group relative flex h-10 w-28 shrink-0 md:h-12 md:w-36">
+        <Link
+          href="/"
+          className="group absolute left-1/2 flex h-10 w-28 -translate-x-1/2 shrink-0 lg:static lg:translate-x-0 md:h-12 md:w-36"
+        >
           <Image
             src="/logo-vdubs.png"
             alt="V-Dub's Cards"
             fill
-            className="object-contain object-left transition-opacity group-hover:opacity-90"
+            className="object-contain object-center transition-opacity group-hover:opacity-90 lg:object-left"
             priority
             sizes="(max-width: 768px) 112px, 144px"
           />

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Instagram, Facebook, Mail, Phone } from "lucide-react";
+import { Instagram, Facebook, Mail } from "lucide-react";
 
 const shopLinks = [
   { href: "/collections/all", label: "All Products" },
@@ -126,13 +126,6 @@ export function Footer() {
               >
                 <Mail className="h-3.5 w-3.5 text-gray-400" />
                 Vdubscards@hotmail.com
-              </a>
-              <a
-                href="tel:+31684386100"
-                className="flex items-center gap-2 text-[13px] text-gray-500 transition-colors duration-200 hover:text-gray-900"
-              >
-                <Phone className="h-3.5 w-3.5 text-gray-400" />
-                +31 6 84 38 61 00
               </a>
             </div>
           </div>
