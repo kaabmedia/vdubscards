@@ -42,7 +42,7 @@ function EventCardContent({
       </div>
       <div className="flex shrink-0 flex-col items-center justify-center gap-1">
         {event.logoUrl && (
-          <div className="relative h-10 w-10 overflow-hidden rounded-md bg-white ring-1 ring-border">
+          <div className="relative h-14 w-14 overflow-hidden rounded-md bg-white ring-1 ring-border">
             <Image
               src={event.logoUrl}
               alt={`${event.name} logo`}
