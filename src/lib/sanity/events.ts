@@ -13,6 +13,7 @@ export interface EventItem {
   endDate?: string;
   link?: string;
   isNext?: boolean;
+  logoUrl?: string;
 }
 
 function formatDateRange(startDate: string | undefined, endDate: string | undefined): string {
@@ -60,7 +61,8 @@ const EVENTS_QUERY = `*[_type == "event"] | order(sortOrder asc, startDate asc) 
   startDate,
   endDate,
   link,
-  isNext
+  isNext,
+  "logoUrl": logo.asset->url
 }`;
 
 export async function getEvents(): Promise<EventItem[]> {
@@ -75,6 +77,7 @@ export async function getEvents(): Promise<EventItem[]> {
       endDate?: string;
       link?: string;
       isNext?: boolean;
+      logoUrl?: string;
     }>>(EVENTS_QUERY);
 
     const events: EventItem[] = docs
@@ -92,6 +95,7 @@ export async function getEvents(): Promise<EventItem[]> {
           endDate: doc.endDate ?? undefined,
           link: doc.link ?? undefined,
           isNext: doc.isNext ?? false,
+          logoUrl: doc.logoUrl ?? undefined,
         };
       });
 

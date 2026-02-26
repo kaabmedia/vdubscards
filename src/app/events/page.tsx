@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { CalendarDays, MapPin, ArrowRight, ExternalLink } from "lucide-react";
 import type { Metadata } from "next";
 import { getEventsSplit, type EventItem } from "@/lib/sanity/events";
@@ -141,9 +142,25 @@ function EventCard({
             {event.date}
           </div>
         </div>
-        {event.link && (
-          <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground/50" />
-        )}
+        <div className="flex shrink-0 flex-col items-center justify-center gap-1">
+          {event.logoUrl && (
+            <div className="relative h-12 w-12 overflow-hidden rounded-lg bg-white ring-1 ring-border">
+              <Image
+                src={event.logoUrl}
+                alt={`${event.name} logo`}
+                fill
+                className="object-contain p-1"
+                sizes="48px"
+              />
+            </div>
+          )}
+          {event.link && !event.logoUrl && (
+            <ExternalLink className="h-4 w-4 text-muted-foreground/50" />
+          )}
+          {event.link && event.logoUrl && (
+            <ExternalLink className="h-3 w-3 text-muted-foreground/40" />
+          )}
+        </div>
       </Wrapper>
     </div>
   );

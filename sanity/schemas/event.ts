@@ -48,6 +48,15 @@ export const event = defineType({
       type: "number",
       description: "Lager = eerder getoond",
     }),
+    defineField({
+      name: "logo",
+      title: "Event Logo",
+      type: "image",
+      description: "Optioneel: logo van het event (wordt rechts in het blokje getoond)",
+      options: {
+        hotspot: true,
+      },
+    }),
   ],
   orderings: [
     { title: "Sorteervolgorde", name: "sortOrder", by: [{ field: "sortOrder", direction: "asc" }] },

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   MapPin,
   ArrowRight,
@@ -39,9 +40,25 @@ function EventCardContent({
           <span className="truncate">{event.location}</span>
         </div>
       </div>
-      {event.link && (
-        <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground/50" />
-      )}
+      <div className="flex shrink-0 flex-col items-center justify-center gap-1">
+        {event.logoUrl && (
+          <div className="relative h-10 w-10 overflow-hidden rounded-md bg-white ring-1 ring-border">
+            <Image
+              src={event.logoUrl}
+              alt={`${event.name} logo`}
+              fill
+              className="object-contain p-0.5"
+              sizes="40px"
+            />
+          </div>
+        )}
+        {event.link && !event.logoUrl && (
+          <ExternalLink className="h-4 w-4 text-muted-foreground/50" />
+        )}
+        {event.link && event.logoUrl && (
+          <ExternalLink className="h-3 w-3 text-muted-foreground/40" />
+        )}
+      </div>
     </div>
   );
 }
