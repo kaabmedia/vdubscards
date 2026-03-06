@@ -1,6 +1,7 @@
 import { shopifyFetch } from "@/lib/shopify/client";
 import {
   PRODUCTS_QUERY,
+  PRODUCT_POOL_QUERY,
   COLLECTIONS_QUERY,
 } from "@/lib/shopify/queries";
 import type {
@@ -19,7 +20,8 @@ import { CollectionsSection } from "@/components/home/CollectionsSection";
 import { EventsSection } from "@/components/home/EventsSection";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
 
-export const dynamic = "force-dynamic";
+// ISR: hervalideer elke 30 minuten
+export const revalidate = 1800;
 
 export default async function HomePage() {
   const [products, collections, pool, events, home] = await Promise.all([
@@ -168,24 +170,24 @@ function getSaleFromPool(
 }
 
 async function fetchProductPool(): Promise<ShopifyProduct[]> {
+  // Haalt max 500 producten op (2 pagina's) gefilterd op price ≥ €20 via Shopify API.
+  // Resultaat wordt gecached door ISR — geen live fetch per bezoeker.
   const pageSize = 250;
-  const maxPages = 8;
+  const maxProducts = 500;
   const pool: ShopifyProduct[] = [];
   let cursor: string | null = null;
   try {
-    for (let page = 0; page < maxPages; page++) {
+    while (pool.length < maxProducts) {
       const data: ProductsResponse = await shopifyFetch<ProductsResponse>({
-        query: PRODUCTS_QUERY,
-        variables: { first: pageSize, after: cursor },
+        query: PRODUCT_POOL_QUERY,
+        variables: { first: pageSize, ...(cursor && { after: cursor }) },
       });
       const edges = data?.products?.edges ?? [];
       const nodes = edges.map((e) => e.node);
       pool.push(...nodes);
-      const hasNext =
-        data?.products?.pageInfo?.hasNextPage &&
-        data?.products?.pageInfo?.endCursor;
-      if (!hasNext || nodes.length === 0) break;
-      cursor = data.products.pageInfo.endCursor;
+      const pageInfo = data?.products?.pageInfo;
+      if (!pageInfo?.hasNextPage || !pageInfo.endCursor || nodes.length === 0) break;
+      cursor = pageInfo.endCursor;
     }
     return pool;
   } catch {

@@ -57,6 +57,35 @@ export const PRODUCTS_QUERY = `
   }
 `;
 
+/** Lightweight pool query voor homepage: alleen benodigde velden, gefilterd op beschikbaar + prijs ≥ €20. */
+export const PRODUCT_POOL_QUERY = `
+  query GetProductPool($first: Int = 250, $after: String) {
+    products(first: $first, after: $after, sortKey: CREATED_AT, reverse: true, query: "available_for_sale:true price:>=20") {
+      edges {
+        node {
+          id
+          title
+          handle
+          priceRange {
+            minVariantPrice { amount currencyCode }
+          }
+          compareAtPriceRange {
+            minVariantPrice { amount currencyCode }
+          }
+          featuredImage { url altText width height }
+          images(first: 2) {
+            edges { node { url altText width height } }
+          }
+          variants(first: 1) {
+            edges { node { id availableForSale quantityAvailable } }
+          }
+        }
+      }
+      pageInfo { hasNextPage endCursor }
+    }
+  }
+`;
+
 export const PRODUCTS_BY_COLLECTION_QUERY = `
   query GetProductsByCollection($handle: String!, $first: Int = 4) {
     collection(handle: $handle) {

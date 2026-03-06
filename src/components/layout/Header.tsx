@@ -317,7 +317,7 @@ export function Header({ menuItems = [] }: HeaderProps) {
           <button
             className="rounded-lg p-2 transition-colors hover:bg-muted active:scale-90 md:hidden"
             onClick={openMobileSearch}
-            aria-label="Zoeken"
+            aria-label="Search"
           >
             <Search className="h-5 w-5" />
           </button>
@@ -416,7 +416,7 @@ export function Header({ menuItems = [] }: HeaderProps) {
               type="button"
               onClick={() => { setMobileSearchOpen(false); setMobileSearchQuery(""); setMobileSearchResults([]); }}
               className="shrink-0 rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted active:scale-90"
-              aria-label="Sluiten"
+              aria-label="Close"
             >
               <X className="h-5 w-5" />
             </button>
@@ -433,9 +433,9 @@ export function Header({ menuItems = [] }: HeaderProps) {
                 name="q"
                 value={mobileSearchQuery}
                 onChange={(e) => setMobileSearchQuery(e.target.value)}
-                placeholder="Zoek producten..."
+                placeholder="Search products..."
                 className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                aria-label="Zoek producten"
+                aria-label="Search products"
                 autoComplete="off"
               />
               {mobileSearchLoading && (
@@ -447,7 +447,7 @@ export function Header({ menuItems = [] }: HeaderProps) {
           {/* Results */}
           <div className="flex-1 overflow-y-auto px-4 py-4">
             {mobileSearchQuery.trim().length < 2 ? (
-              <p className="mt-8 text-center text-sm text-muted-foreground">Type om te zoeken...</p>
+              <p className="mt-8 text-center text-sm text-muted-foreground">Start typing to search...</p>
             ) : mobileSearchLoading && mobileSearchResults.length === 0 ? (
               /* Skeleton */
               <div className="grid grid-cols-2 gap-3">
@@ -508,12 +508,12 @@ export function Header({ menuItems = [] }: HeaderProps) {
                   className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-border py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted active:bg-muted"
                 >
                   <Search className="h-4 w-4" />
-                  Alle resultaten voor &ldquo;{mobileSearchQuery.trim()}&rdquo;
+                  All results for &ldquo;{mobileSearchQuery.trim()}&rdquo;
                 </Link>
               </div>
             ) : (
               <p className="mt-8 text-center text-sm text-muted-foreground">
-                Geen resultaten voor &ldquo;{mobileSearchQuery.trim()}&rdquo;
+                No results for &ldquo;{mobileSearchQuery.trim()}&rdquo;
               </p>
             )}
           </div>
