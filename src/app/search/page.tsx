@@ -35,7 +35,8 @@ export default async function SearchPage({ searchParams }: Props) {
 
   const sortKeyParam = sp.sortKey ?? "RELEVANCE";
   const reverse = sp.reverse !== "false";
-  const filters = parseFiltersParam(sp.filters);
+  const userFilters = parseFiltersParam(sp.filters);
+  const productFilters = [{ available: true }, ...userFilters];
 
   const data = await shopifyFetch<SearchPageResponse>({
     query: SEARCH_PAGE_QUERY,
@@ -44,7 +45,7 @@ export default async function SearchPage({ searchParams }: Props) {
       first: 24,
       sortKey: sortKeyParam === "PRICE" ? "PRICE" : "RELEVANCE",
       reverse,
-      ...(filters.length > 0 && { productFilters: filters }),
+      productFilters,
     },
   }).catch(() => null);
 

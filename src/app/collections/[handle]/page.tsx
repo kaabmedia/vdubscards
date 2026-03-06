@@ -68,7 +68,8 @@ export default async function CollectionPage({ params, searchParams }: Props) {
       ? sortKeyParam
       : "CREATED";
   const reverse = sp.reverse !== "false";
-  const filters = parseFiltersParam(sp.filters);
+  const userFilters = parseFiltersParam(sp.filters);
+  const filters = [{ available: true }, ...userFilters];
 
   const [data, totalProductsCount] = await Promise.all([
     shopifyFetch<CollectionPageResponse>({
@@ -78,7 +79,7 @@ export default async function CollectionPage({ params, searchParams }: Props) {
         first: 24,
         sortKey,
         reverse,
-        ...(filters.length > 0 && { filters }),
+        filters,
       },
     }),
     getCollectionProductCount(handle, { sortKey, reverse, filters }),
@@ -89,7 +90,7 @@ export default async function CollectionPage({ params, searchParams }: Props) {
 
   const products = collection.products.edges.map((e) => e.node);
   const pageInfo = collection.products.pageInfo;
-  const availableFilters = collection.products.filters ?? [];
+  const availableFilters = (collection.products.filters ?? []).filter((f) => f.id !== "filter.v.availability");
   const isSaleCollection = handle.toLowerCase() === "sale";
 
   return (

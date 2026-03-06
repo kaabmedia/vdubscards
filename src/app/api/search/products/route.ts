@@ -17,16 +17,17 @@ export async function GET(request: Request) {
     : "RELEVANCE";
   const reverse = searchParams.get("reverse") === "true";
 
-  let filters: Record<string, unknown>[] = [];
+  let userFilters: Record<string, unknown>[] = [];
   const filtersRaw = searchParams.get("filters");
   if (filtersRaw) {
     try {
       const parsed = JSON.parse(filtersRaw);
-      if (Array.isArray(parsed)) filters = parsed;
+      if (Array.isArray(parsed)) userFilters = parsed;
     } catch {
       /* ignore */
     }
   }
+  const filters = [{ available: true }, ...userFilters];
 
   if (!q) {
     return NextResponse.json(
@@ -44,7 +45,7 @@ export async function GET(request: Request) {
         ...(after && { after }),
         sortKey,
         reverse,
-        ...(filters.length > 0 && { productFilters: filters }),
+        productFilters: filters,
       },
     });
 

@@ -70,21 +70,22 @@ export async function GET(
     : "CREATED";
   const reverse = searchParams.get("reverse") !== "false";
 
-  let filters: Record<string, unknown>[] = [];
+  let userFilters: Record<string, unknown>[] = [];
   const filtersRaw = searchParams.get("filters");
   if (filtersRaw) {
     try {
       const parsed = JSON.parse(filtersRaw);
-      if (Array.isArray(parsed)) filters = parsed;
+      if (Array.isArray(parsed)) userFilters = parsed;
     } catch { /* ignore */ }
   }
+  const filters = [{ available: true }, ...userFilters];
 
   const queryVars = {
     handle,
     first: PAGE_SIZE,
     sortKey,
     reverse,
-    ...(filters.length > 0 && { filters }),
+    filters,
   };
 
   try {

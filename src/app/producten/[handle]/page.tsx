@@ -108,7 +108,7 @@ export default async function ProductPage({
 
         const candidates = collection.products.edges
           .map((e) => e.node)
-          .filter((p) => p.id !== product.id);
+          .filter((p) => p.id !== product.id && p.variants?.edges?.[0]?.node?.availableForSale !== false);
 
         // Score each candidate by how many title words match
         const scored = candidates.map((p) => {
