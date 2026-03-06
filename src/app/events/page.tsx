@@ -106,7 +106,7 @@ function EventCard({
     : {};
 
   return (
-    <div className={`relative rounded-lg border ${
+    <div className={`relative min-w-0 rounded-lg border ${
       isNext
         ? "border-amber-400 bg-amber-50/30"
         : "border-gray-200 bg-white"
@@ -132,14 +132,14 @@ function EventCard({
         </div>
         {/* Info */}
         <div className="min-w-0 flex-1">
-          <h2 className="font-bold text-gray-900">{event.name}</h2>
-          <div className="mt-1.5 flex items-center gap-1.5 text-sm text-gray-600">
+          <h2 className="truncate font-bold text-gray-900">{event.name}</h2>
+          <div className="mt-1.5 flex min-w-0 items-center gap-1.5 text-sm text-gray-600">
             <MapPin className="h-3.5 w-3.5 shrink-0" />
-            {event.location}
+            <span className="truncate">{event.location}</span>
           </div>
-          <div className="mt-1 flex items-center gap-1.5 text-sm text-gray-600">
+          <div className="mt-1 flex min-w-0 items-center gap-1.5 text-sm text-gray-600">
             <CalendarDays className="h-3.5 w-3.5 shrink-0" />
-            {event.date}
+            <span className="truncate">{event.date}</span>
           </div>
         </div>
         <div className="flex shrink-0 flex-col items-center justify-center gap-1">
