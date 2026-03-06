@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
+import { unstable_cache } from "next/cache";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
@@ -7,10 +7,16 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { WishlistProvider } from "@/components/wishlist/WishlistProvider";
-import { getDefaultMenuItems, getMainMenu, type NavLink } from "@/lib/shopify/menu";
+import { shopifyFetch } from "@/lib/shopify/client";
+import { MENU_QUERY } from "@/lib/shopify/queries";
+import type { MenuResponse } from "@/lib/shopify/types";
+import {
+  parseMenuItems,
+  countAllMenuItems,
+  getDefaultMenuItems,
+  type NavLink,
+} from "@/lib/shopify/menu";
 import { getHomeSettings } from "@/lib/sanity/countdown";
-
-export const dynamic = "force-dynamic";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -22,6 +28,47 @@ export const metadata: Metadata = {
   description:
     "One of Europe's Largest Single-Card Marketplaces. Premium cards, comics & collectibles curated with care.",
 };
+
+const MENU_HANDLES = ["main-menu", "main_menu", "header", "navigation"];
+const SHOPIFY_STOREFRONT_URL = process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_API_URL ?? "";
+
+/** Cached menu fetch: tries tokenless first (more nested items), falls back to token-based. Cached 1 hour. */
+const getCachedMenu = unstable_cache(
+  async (): Promise<NavLink[]> => {
+    let best: NavLink[] = [];
+    let bestCount = 0;
+    for (const handle of MENU_HANDLES) {
+      try {
+        let data: MenuResponse | null = null;
+        if (SHOPIFY_STOREFRONT_URL) {
+          const res = await fetch(SHOPIFY_STOREFRONT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query: MENU_QUERY, variables: { handle } }),
+          });
+          const json = await res.json().catch(() => ({}));
+          if (res.ok && !json.errors?.length) data = (json.data ?? null) as MenuResponse | null;
+        }
+        if (!data?.menu?.items?.length) {
+          data = await shopifyFetch<MenuResponse>({ query: MENU_QUERY, variables: { handle } });
+        }
+        const links = parseMenuItems(data);
+        const total = countAllMenuItems(links);
+        if (total > bestCount) { bestCount = total; best = links; }
+      } catch { continue; }
+    }
+    return best.length > 0 ? best : getDefaultMenuItems();
+  },
+  ["layout-menu"],
+  { revalidate: 3600 }
+);
+
+/** Cached home settings: used for newDrop menu toggle. Cached 30 minutes. */
+const getCachedHomeSettings = unstable_cache(
+  async () => getHomeSettings(),
+  ["layout-home-settings"],
+  { revalidate: 1800 }
+);
 
 function filterOutNewDrop(links: NavLink[]): NavLink[] {
   return links
@@ -37,30 +84,15 @@ function filterOutNewDrop(links: NavLink[]): NavLink[] {
     }));
 }
 
-async function fetchMenuItems(): Promise<NavLink[]> {
-  try {
-    const headersList = await headers();
-    const host = headersList.get("host") ?? "localhost:3000";
-    const protocol = headersList.get("x-forwarded-proto") ?? "http";
-    const base = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `${protocol}://${host}`;
-    const res = await fetch(`${base}/api/menu`, { cache: "no-store" });
-    const data = await res.json();
-    if (Array.isArray(data?.menuItems) && data.menuItems.length > 0) return data.menuItems;
-  } catch {
-    // fallback
-  }
-  return await getMainMenu();
-}
-
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  let menuItems = await fetchMenuItems();
+  let menuItems = await getCachedMenu();
   if (menuItems.length === 0) menuItems = getDefaultMenuItems();
 
-  const { newDrop } = await getHomeSettings();
+  const { newDrop } = await getCachedHomeSettings();
   if (!newDrop.enabled) {
     menuItems = filterOutNewDrop(menuItems);
   }

@@ -17,7 +17,7 @@ import { ProductImageGallery } from "@/components/shop/ProductImageGallery";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 600; // ISR: hervalideer elke 10 minuten (voorraad kan wijzigen)
 
 export async function generateMetadata({
   params,

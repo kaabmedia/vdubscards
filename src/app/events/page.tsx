@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "Find V-Dub's Cards at card events, markets and expos across Europe. Come say hi!",
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 900; // ISR: hervalideer elke 15 minuten
 
 export default async function EventsPage() {
   const { upcoming, past } = await getEventsSplit();

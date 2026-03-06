@@ -4,7 +4,7 @@ import { shopifyFetch } from "@/lib/shopify/client";
 import { COLLECTIONS_QUERY } from "@/lib/shopify/queries";
 import type { CollectionsResponse, ShopifyCollection } from "@/lib/shopify/types";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600; // ISR: hervalideer elk uur
 
 async function getAllCollections(): Promise<ShopifyCollection[]> {
   try {
