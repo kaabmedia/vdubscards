@@ -15,6 +15,7 @@ import {
 import { useCart } from "@/components/cart/CartProvider";
 import { useWishlist } from "@/components/wishlist/WishlistProvider";
 import type { NavLink } from "@/lib/shopify/menu";
+import type { ShopifyProduct } from "@/lib/shopify/types";
 
 /* ─────────────────────────── Mobile nav ────────────────────────── */
 
@@ -211,10 +212,16 @@ export function Header({ menuItems = [] }: HeaderProps) {
   const { itemCount } = useCart();
   const { count: wishlistCount } = useWishlist();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [mobileSearchQuery, setMobileSearchQuery] = useState("");
+  const [mobileSearchResults, setMobileSearchResults] = useState<ShopifyProduct[]>([]);
+  const [mobileSearchLoading, setMobileSearchLoading] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
   const [prevCount, setPrevCount] = useState(itemCount);
   const [cartBounce, setCartBounce] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
+  const mobileSearchRef = useRef<HTMLInputElement>(null);
+  const searchAbortRef = useRef<AbortController | null>(null);
 
   // Animate cart badge when count changes
   useEffect(() => {
@@ -226,21 +233,95 @@ export function Header({ menuItems = [] }: HeaderProps) {
     setPrevCount(itemCount);
   }, [itemCount, prevCount]);
 
+  // Auto-focus mobile search input when opened
+  useEffect(() => {
+    if (mobileSearchOpen) {
+      const t = setTimeout(() => mobileSearchRef.current?.focus(), 50);
+      return () => clearTimeout(t);
+    }
+  }, [mobileSearchOpen]);
+
+  // Close mobile search on Escape
+  useEffect(() => {
+    if (!mobileSearchOpen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileSearchOpen(false);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [mobileSearchOpen]);
+
+  // Debounced live search with abort
+  useEffect(() => {
+    const q = mobileSearchQuery.trim();
+    if (q.length < 2) {
+      searchAbortRef.current?.abort();
+      setMobileSearchResults([]);
+      setMobileSearchLoading(false);
+      return;
+    }
+    setMobileSearchLoading(true);
+    const t = setTimeout(async () => {
+      searchAbortRef.current?.abort();
+      const controller = new AbortController();
+      searchAbortRef.current = controller;
+      try {
+        const res = await fetch(
+          `/api/search/products?q=${encodeURIComponent(q)}&first=4`,
+          { signal: controller.signal }
+        );
+        const data = await res.json();
+        setMobileSearchResults(data.products?.slice(0, 4) ?? []);
+      } catch (err) {
+        if ((err as Error).name !== "AbortError") setMobileSearchResults([]);
+      } finally {
+        if (!controller.signal.aborted) setMobileSearchLoading(false);
+      }
+    }, 350);
+    return () => {
+      clearTimeout(t);
+      searchAbortRef.current?.abort();
+    };
+  }, [mobileSearchQuery]);
+
+  const openMobileMenu = () => {
+    setMobileSearchOpen(false);
+    setMobileSearchQuery("");
+    setMobileSearchResults([]);
+    setMobileOpen((o) => !o);
+  };
+
+  const openMobileSearch = () => {
+    setMobileOpen(false);
+    setMobileSearchOpen((o) => {
+      if (o) {
+        setMobileSearchQuery("");
+        setMobileSearchResults([]);
+      }
+      return !o;
+    });
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-white">
       <div className="relative container mx-auto flex h-16 items-center justify-between gap-4 px-4">
-        {/* Mobile menu button */}
-        <button
-          className="rounded-lg p-1 transition-transform active:scale-90 lg:hidden"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
-        >
-          {mobileOpen ? (
-            <X className="h-6 w-6" />
-          ) : (
-            <Menu className="h-6 w-6" />
-          )}
-        </button>
+        {/* Mobile left: hamburger + search */}
+        <div className="flex items-center gap-0.5 lg:hidden">
+          <button
+            className="rounded-lg p-2 transition-colors hover:bg-muted active:scale-90"
+            onClick={openMobileMenu}
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+          <button
+            className="rounded-lg p-2 transition-colors hover:bg-muted active:scale-90 md:hidden"
+            onClick={openMobileSearch}
+            aria-label="Zoeken"
+          >
+            <Search className="h-5 w-5" />
+          </button>
+        </div>
 
         {/* Logo */}
         <Link
@@ -269,7 +350,7 @@ export function Header({ menuItems = [] }: HeaderProps) {
 
         {/* Right side: search + icons */}
         <div className="flex items-center gap-2">
-          {/* Search bar */}
+          {/* Desktop search bar */}
           <form
             action="/search"
             method="GET"
@@ -326,12 +407,123 @@ export function Header({ menuItems = [] }: HeaderProps) {
         </div>
       </div>
 
+      {/* Mobile search – fullscreen overlay */}
+      {mobileSearchOpen && (
+        <div className="fixed inset-0 z-[60] flex flex-col bg-white md:hidden">
+          {/* Top bar */}
+          <div className="flex items-center gap-3 border-b border-border px-4 py-3">
+            <button
+              type="button"
+              onClick={() => { setMobileSearchOpen(false); setMobileSearchQuery(""); setMobileSearchResults([]); }}
+              className="shrink-0 rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted active:scale-90"
+              aria-label="Sluiten"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <form
+              action="/search"
+              method="GET"
+              className="flex flex-1 items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-2 focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(255,204,2,0.12)] transition-all"
+              onSubmit={() => { setMobileSearchOpen(false); setMobileSearchQuery(""); setMobileSearchResults([]); }}
+            >
+              <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <input
+                ref={mobileSearchRef}
+                type="search"
+                name="q"
+                value={mobileSearchQuery}
+                onChange={(e) => setMobileSearchQuery(e.target.value)}
+                placeholder="Zoek producten..."
+                className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                aria-label="Zoek producten"
+                autoComplete="off"
+              />
+              {mobileSearchLoading && (
+                <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-border border-t-primary" />
+              )}
+            </form>
+          </div>
+
+          {/* Results */}
+          <div className="flex-1 overflow-y-auto px-4 py-4">
+            {mobileSearchQuery.trim().length < 2 ? (
+              <p className="mt-8 text-center text-sm text-muted-foreground">Type om te zoeken...</p>
+            ) : mobileSearchLoading && mobileSearchResults.length === 0 ? (
+              /* Skeleton */
+              <div className="grid grid-cols-2 gap-3">
+                {[0, 1, 2, 3].map((i) => (
+                  <div key={i} className="flex flex-col overflow-hidden rounded-xl border border-border">
+                    <div className="aspect-square animate-pulse bg-muted" />
+                    <div className="space-y-2 p-2.5">
+                      <div className="h-2.5 w-4/5 animate-pulse rounded-full bg-muted" />
+                      <div className="h-2.5 w-3/5 animate-pulse rounded-full bg-muted" />
+                      <div className="h-2.5 w-1/4 animate-pulse rounded-full bg-muted" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : mobileSearchResults.length > 0 ? (
+              <div className={`transition-opacity duration-200 ${mobileSearchLoading ? "opacity-40 pointer-events-none" : "opacity-100"}`}>
+                <div className="grid grid-cols-2 gap-3">
+                  {mobileSearchResults.map((product) => {
+                    const price = new Intl.NumberFormat("nl-NL", {
+                      style: "currency",
+                      currency: product.priceRange.minVariantPrice.currencyCode,
+                    }).format(parseFloat(product.priceRange.minVariantPrice.amount));
+                    return (
+                      <Link
+                        key={product.id}
+                        href={`/producten/${product.handle}`}
+                        onClick={() => { setMobileSearchOpen(false); setMobileSearchQuery(""); setMobileSearchResults([]); }}
+                        className="group flex flex-col overflow-hidden rounded-xl border border-border bg-white transition-all active:scale-[0.97]"
+                      >
+                        <div className="relative aspect-square overflow-hidden bg-muted">
+                          {product.featuredImage ? (
+                            <Image
+                              src={product.featuredImage.url}
+                              alt={product.featuredImage.altText ?? product.title}
+                              fill
+                              className="object-cover transition-transform duration-300 group-hover:scale-105"
+                              sizes="45vw"
+                            />
+                          ) : (
+                            <div className="flex h-full items-center justify-center">
+                              <ShoppingBag className="h-8 w-8 opacity-20" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-2.5">
+                          <p className="line-clamp-2 text-xs font-medium leading-tight text-foreground">
+                            {product.title}
+                          </p>
+                          <p className="mt-1 text-xs font-semibold text-primary">{price}</p>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+                <Link
+                  href={`/search?q=${encodeURIComponent(mobileSearchQuery.trim())}`}
+                  onClick={() => { setMobileSearchOpen(false); setMobileSearchQuery(""); setMobileSearchResults([]); }}
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-border py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted active:bg-muted"
+                >
+                  <Search className="h-4 w-4" />
+                  Alle resultaten voor &ldquo;{mobileSearchQuery.trim()}&rdquo;
+                </Link>
+              </div>
+            ) : (
+              <p className="mt-8 text-center text-sm text-muted-foreground">
+                Geen resultaten voor &ldquo;{mobileSearchQuery.trim()}&rdquo;
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Mobile Navigation */}
       <nav
-        className={`overflow-y-auto border-t border-border bg-white transition-all duration-300 lg:hidden ${
-          mobileOpen
-            ? "max-h-[70vh] opacity-100"
-            : "max-h-0 opacity-0 border-t-0"
+        className={`overflow-y-auto border-border bg-white transition-all duration-300 lg:hidden ${
+          mobileOpen ? "border-t max-h-[70vh] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
         <div className="flex flex-col gap-0.5 px-4 py-4">
@@ -343,21 +535,6 @@ export function Header({ menuItems = [] }: HeaderProps) {
               depth={0}
             />
           ))}
-          {/* Mobile search */}
-          <form
-            action="/search"
-            method="GET"
-            className="mt-3 flex items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-2 text-sm transition-all focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(255,204,2,0.15)]"
-          >
-            <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
-            <input
-              type="search"
-              name="q"
-              placeholder="Search products..."
-              className="flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
-              aria-label="Search products"
-            />
-          </form>
         </div>
       </nav>
     </header>

@@ -127,7 +127,7 @@ export function ProductCard({ product, showSaleBadge }: ProductCardProps) {
           href={`/producten/${product.handle}`}
           className="group/title"
         >
-          <h3 className="line-clamp-1 text-sm font-medium leading-tight text-foreground transition-colors group-hover/title:text-primary">
+          <h3 className="line-clamp-2 text-sm font-medium leading-tight text-foreground transition-colors group-hover/title:text-primary">
             {product.title}
           </h3>
         </Link>

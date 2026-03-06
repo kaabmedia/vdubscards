@@ -13,7 +13,7 @@ import { NewsletterSection } from "@/components/home/NewsletterSection";
 export const metadata: Metadata = {
   title: "Shipping & Delivery | V-Dub's Cards",
   description:
-    "Shipping information for V-Dub's Cards. Free standard shipping on orders over €150. Ship to Netherlands, EU, and worldwide.",
+    "Shipping information for V-Dub's Cards. Free standard shipping on orders over €125. Ship to Netherlands, EU, and worldwide.",
 };
 
 const shippingMethods = [
@@ -71,7 +71,7 @@ export default function ShippingPage() {
             className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
           >
             <Truck className="h-4 w-4" />
-            Free Standard Shipping on orders over €150.00
+            Free Standard Shipping on orders over €125.00
           </Link>
         </div>
 
