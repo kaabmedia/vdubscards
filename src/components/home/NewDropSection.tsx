@@ -47,7 +47,7 @@ export function NewDropSection({
             )}
             <Link
               href={buttonLink}
-              className="mt-6 inline-flex w-fit items-center justify-center rounded-lg bg-gray-900 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800"
+              className="mt-6 inline-flex w-fit items-center justify-center rounded-full bg-gray-900 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800"
             >
               {buttonText}
             </Link>
