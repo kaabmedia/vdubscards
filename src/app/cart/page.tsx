@@ -55,7 +55,6 @@ export default function CartPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatingLines, setUpdatingLines] = useState<Set<string>>(new Set());
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   const fetchCart = useCallback(() => {
     if (!cartId) return;
@@ -149,38 +148,22 @@ export default function CartPage() {
     handleUpdateQuantity(variantId, 0, undefined);
   };
 
-  const handleCheckout = async () => {
-    setCheckoutLoading(true);
+  const handleCheckout = () => {
+    // Bouw een klassieke Shopify cart URL: /{shop}/cart/{variantId}:{qty},...
+    // Dit werkt altijd en verloopt nooit, ongeacht cart state.
+    const shopApiUrl = process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_API_URL ?? "";
     try {
-      const res = await fetch("/api/cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          cartId: cartId ?? undefined,
-          lines: lines.map((l) => ({ variantId: l.variantId, quantity: l.quantity })),
-        }),
-      });
-      const data = await res.json();
-      if (data.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
-        return;
-      }
-      // API gaf geen URL terug — probeer zonder cartId (force nieuwe cart)
-      const retry = await fetch("/api/cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          lines: lines.map((l) => ({ variantId: l.variantId, quantity: l.quantity })),
-        }),
-      });
-      const retryData = await retry.json();
-      if (retryData.checkoutUrl) {
-        window.location.href = retryData.checkoutUrl;
-      }
+      const shopOrigin = new URL(shopApiUrl).origin;
+      const items = lines
+        .map((l) => {
+          // GID formaat: gid://shopify/ProductVariant/12345 → 12345
+          const numericId = l.variantId.split("/").pop() ?? l.variantId;
+          return `${numericId}:${l.quantity}`;
+        })
+        .join(",");
+      window.location.href = `${shopOrigin}/cart/${items}`;
     } catch {
-      // noop
-    } finally {
-      setCheckoutLoading(false);
+      if (displayCheckoutUrl) window.location.href = displayCheckoutUrl;
     }
   };
 
@@ -494,14 +477,10 @@ export default function CartPage() {
 
             <button
               onClick={handleCheckout}
-              disabled={checkoutLoading || (!displayCheckoutUrl && lines.length === 0)}
+              disabled={lines.length === 0}
               className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-foreground py-3 text-sm font-semibold text-background transition-colors hover:bg-foreground/90 disabled:opacity-50"
             >
-              {checkoutLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <ArrowRight className="h-4 w-4" />
-              )}
+              <ArrowRight className="h-4 w-4" />
               Checkout
             </button>
 
