@@ -148,24 +148,6 @@ export default function CartPage() {
     handleUpdateQuantity(variantId, 0, undefined);
   };
 
-  const handleCheckout = () => {
-    // Bouw een klassieke Shopify cart URL: /{shop}/cart/{variantId}:{qty},...
-    // Dit werkt altijd en verloopt nooit, ongeacht cart state.
-    const shopApiUrl = process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_API_URL ?? "";
-    try {
-      const shopOrigin = new URL(shopApiUrl).origin;
-      const items = lines
-        .map((l) => {
-          // GID formaat: gid://shopify/ProductVariant/12345 → 12345
-          const numericId = l.variantId.split("/").pop() ?? l.variantId;
-          return `${numericId}:${l.quantity}`;
-        })
-        .join(",");
-      window.location.href = `${shopOrigin}/cart/${items}`;
-    } catch {
-      if (displayCheckoutUrl) window.location.href = displayCheckoutUrl;
-    }
-  };
 
   // Loading state
   if (loading && !cart) {
@@ -475,14 +457,23 @@ export default function CartPage() {
               </p>
             </div>
 
-            <button
-              onClick={handleCheckout}
-              disabled={lines.length === 0}
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-foreground py-3 text-sm font-semibold text-background transition-colors hover:bg-foreground/90 disabled:opacity-50"
-            >
-              <ArrowRight className="h-4 w-4" />
-              Checkout
-            </button>
+            {displayCheckoutUrl ? (
+              <a
+                href={displayCheckoutUrl}
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-foreground py-3 text-sm font-semibold text-background transition-colors hover:bg-foreground/90"
+              >
+                Checkout
+                <ArrowRight className="h-4 w-4" />
+              </a>
+            ) : (
+              <button
+                disabled
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-foreground py-3 text-sm font-semibold text-background opacity-50"
+              >
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Checkout
+              </button>
+            )}
 
             {/* Trust signals */}
             <div className="mt-6 space-y-2.5">
