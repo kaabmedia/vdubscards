@@ -1,6 +1,19 @@
 import type { NextConfig } from "next";
 
-const shopifyDomain = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN ?? "";
+// Extract myshopify domain from storefront API URL (always set in production)
+// Falls back to explicit NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN if set
+function getShopifyDomain(): string {
+  const explicit = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN;
+  if (explicit) return explicit;
+  const apiUrl = process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_API_URL ?? "";
+  try {
+    return new URL(apiUrl).hostname;
+  } catch {
+    return "";
+  }
+}
+
+const shopifyDomain = getShopifyDomain();
 
 const nextConfig: NextConfig = {
   images: {
