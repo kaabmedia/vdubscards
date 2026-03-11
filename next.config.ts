@@ -10,18 +10,20 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
     ],
   },
-  async redirects() {
+  async rewrites() {
     if (!shopifyDomain) return [];
     return [
       {
         source: "/cart/c/:path*",
         destination: `https://${shopifyDomain}/cart/c/:path*`,
-        permanent: false,
       },
       {
         source: "/checkouts/:path*",
         destination: `https://${shopifyDomain}/checkouts/:path*`,
-        permanent: false,
+      },
+      {
+        source: "/payments/:path*",
+        destination: `https://${shopifyDomain}/payments/:path*`,
       },
     ];
   },

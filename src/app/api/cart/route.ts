@@ -8,20 +8,6 @@ import {
   CART_LINES_REMOVE_MUTATION,
 } from "@/lib/shopify/queries";
 
-const SHOPIFY_STORE_DOMAIN = process.env.NEXT_PUBLIC_SHOPIFY_STORE_DOMAIN ?? "";
-
-/** Vervang het domein in checkoutUrl met het echte myshopify-domein */
-function fixCheckoutUrl(url: string | null): string | null {
-  if (!url || !SHOPIFY_STORE_DOMAIN) return url;
-  try {
-    const parsed = new URL(url);
-    parsed.hostname = SHOPIFY_STORE_DOMAIN;
-    return parsed.toString();
-  } catch {
-    return url;
-  }
-}
-
 /** GET /api/cart?cartId=... - Haal cart op met productinformatie */
 export async function GET(request: NextRequest) {
   const cartId = request.nextUrl.searchParams.get("cartId");
@@ -37,9 +23,6 @@ export async function GET(request: NextRequest) {
       variables: { cartId },
     });
     const cart = data?.cart ?? null;
-    if (cart?.checkoutUrl) {
-      cart.checkoutUrl = fixCheckoutUrl(cart.checkoutUrl);
-    }
     return NextResponse.json(cart);
   } catch (e) {
     console.error("Cart GET error:", e);
@@ -127,7 +110,7 @@ async function executeCartPost(
     if (!cart) {
       throw new Error("Geen cart aangemaakt");
     }
-    return { cartId: cart.id, checkoutUrl: fixCheckoutUrl(cart.checkoutUrl) };
+    return { cartId: cart.id, checkoutUrl: cart.checkoutUrl };
   }
 
   // Bestaande cart: haal op en sync (update bestaande regels, voeg nieuwe toe)
@@ -156,7 +139,7 @@ async function executeCartPost(
     }
     const newCart = create?.cart;
     if (!newCart) throw new Error("Kon geen nieuwe cart aanmaken");
-    return { cartId: newCart.id, checkoutUrl: fixCheckoutUrl(newCart.checkoutUrl) };
+    return { cartId: newCart.id, checkoutUrl: newCart.checkoutUrl };
   }
 
   const existingByVariant = new Map<string, { lineId: string; quantity: number }>();
@@ -247,7 +230,7 @@ async function executeCartPost(
     if (add?.cart?.checkoutUrl) lastCheckoutUrl = add.cart.checkoutUrl;
   }
 
-  return { cartId, checkoutUrl: fixCheckoutUrl(lastCheckoutUrl) };
+  return { cartId, checkoutUrl: lastCheckoutUrl };
 }
 
 interface CartResponse {
