@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Search,
@@ -209,6 +210,7 @@ interface HeaderProps {
 }
 
 export function Header({ menuItems = [] }: HeaderProps) {
+  const router = useRouter();
   const { itemCount } = useCart();
   const { count: wishlistCount } = useWishlist();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -424,7 +426,14 @@ export function Header({ menuItems = [] }: HeaderProps) {
               action="/search"
               method="GET"
               className="flex flex-1 items-center gap-2 rounded-full border border-border bg-muted/50 px-3 py-2 focus-within:border-primary focus-within:shadow-[0_0_0_3px_rgba(255,204,2,0.12)] transition-all"
-              onSubmit={() => { setMobileSearchOpen(false); setMobileSearchQuery(""); setMobileSearchResults([]); }}
+              onSubmit={(e) => {
+                e.preventDefault();
+                const q = mobileSearchQuery.trim();
+                setMobileSearchOpen(false);
+                setMobileSearchQuery("");
+                setMobileSearchResults([]);
+                if (q) router.push(`/search?q=${encodeURIComponent(q)}`);
+              }}
             >
               <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
               <input
