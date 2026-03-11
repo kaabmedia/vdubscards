@@ -1,3 +1,11 @@
+export const SHOP_ID_QUERY = `
+  query ShopId {
+    shop {
+      id
+    }
+  }
+`;
+
 export const PRODUCTS_QUERY = `
   query GetProducts($first: Int = 12, $after: String) {
     products(first: $first, after: $after, sortKey: CREATED_AT, reverse: true, query: "available_for_sale:true") {

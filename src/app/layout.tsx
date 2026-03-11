@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import { unstable_cache } from "next/cache";
 import { Inter } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { WishlistProvider } from "@/components/wishlist/WishlistProvider";
+import { ShopifyAnalytics } from "@/components/analytics/ShopifyAnalytics";
 import { shopifyFetch } from "@/lib/shopify/client";
-import { MENU_QUERY } from "@/lib/shopify/queries";
+import { MENU_QUERY, SHOP_ID_QUERY } from "@/lib/shopify/queries";
 import type { MenuResponse } from "@/lib/shopify/types";
 import {
   parseMenuItems,
@@ -84,6 +86,15 @@ function filterOutNewDrop(links: NavLink[]): NavLink[] {
     }));
 }
 
+async function getShopId(): Promise<string> {
+  try {
+    const data = await shopifyFetch<{ shop: { id: string } }>({ query: SHOP_ID_QUERY });
+    return data?.shop?.id ?? "";
+  } catch {
+    return "";
+  }
+}
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -91,6 +102,8 @@ export default async function RootLayout({
 }>) {
   let menuItems = await getCachedMenu();
   if (menuItems.length === 0) menuItems = getDefaultMenuItems();
+
+  const shopId = await getShopId();
 
   const { newDrop } = await getCachedHomeSettings();
   if (!newDrop.enabled) {
@@ -104,6 +117,9 @@ export default async function RootLayout({
       >
         <CartProvider>
           <WishlistProvider>
+            <Suspense>
+              <ShopifyAnalytics shopId={shopId} />
+            </Suspense>
             <AnnouncementBar />
             <Header menuItems={menuItems} />
             <main className="flex-1">{children}</main>

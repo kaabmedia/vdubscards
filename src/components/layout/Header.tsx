@@ -434,9 +434,11 @@ export function Header({ menuItems = [] }: HeaderProps) {
                 value={mobileSearchQuery}
                 onChange={(e) => setMobileSearchQuery(e.target.value)}
                 placeholder="Search products..."
-                className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                className="flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
+                style={{ fontSize: "16px" }}
                 aria-label="Search products"
                 autoComplete="off"
+                enterKeyHint="search"
               />
               {mobileSearchLoading && (
                 <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-border border-t-primary" />
