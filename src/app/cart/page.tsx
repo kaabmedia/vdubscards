@@ -161,13 +161,24 @@ export default function CartPage() {
         }),
       });
       const data = await res.json();
-      const freshUrl = data.checkoutUrl ?? displayCheckoutUrl;
-      if (freshUrl) {
-        window.location.href = freshUrl;
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+        return;
+      }
+      // API gaf geen URL terug — probeer zonder cartId (force nieuwe cart)
+      const retry = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lines: lines.map((l) => ({ variantId: l.variantId, quantity: l.quantity })),
+        }),
+      });
+      const retryData = await retry.json();
+      if (retryData.checkoutUrl) {
+        window.location.href = retryData.checkoutUrl;
       }
     } catch {
-      const fallback = displayCheckoutUrl;
-      if (fallback) window.location.href = fallback;
+      // noop
     } finally {
       setCheckoutLoading(false);
     }

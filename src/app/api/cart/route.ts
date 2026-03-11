@@ -119,7 +119,26 @@ async function executeCartPost(
   });
   const existingCart = cartData?.cart;
   if (!existingCart) {
-    throw new Error("Cart niet gevonden; maak een nieuwe aan");
+    // Cart verlopen of niet gevonden — maak een nieuwe aan
+    if (!cartLineInput.length) {
+      throw new Error("Cart niet gevonden en geen lines opgegeven");
+    }
+    const result = await shopifyFetch<{
+      cartCreate: {
+        cart: { id: string; checkoutUrl: string } | null;
+        userErrors: Array<{ field: string[]; message: string }>;
+      };
+    }>({
+      query: CREATE_CART_MUTATION,
+      variables: { lines: cartLineInput },
+    });
+    const create = result?.cartCreate;
+    if (create?.userErrors?.length) {
+      throw new Error(create.userErrors.map((e) => e.message).join(", "));
+    }
+    const newCart = create?.cart;
+    if (!newCart) throw new Error("Kon geen nieuwe cart aanmaken");
+    return { cartId: newCart.id, checkoutUrl: newCart.checkoutUrl };
   }
 
   const existingByVariant = new Map<string, { lineId: string; quantity: number }>();
