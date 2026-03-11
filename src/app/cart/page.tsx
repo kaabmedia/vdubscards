@@ -55,6 +55,7 @@ export default function CartPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatingLines, setUpdatingLines] = useState<Set<string>>(new Set());
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   const fetchCart = useCallback(() => {
     if (!cartId) return;
@@ -146,6 +147,30 @@ export default function CartPage() {
 
   const handleRemove = (variantId: string) => {
     handleUpdateQuantity(variantId, 0, undefined);
+  };
+
+  const handleCheckout = async () => {
+    setCheckoutLoading(true);
+    try {
+      const res = await fetch("/api/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cartId: cartId ?? undefined,
+          lines: lines.map((l) => ({ variantId: l.variantId, quantity: l.quantity })),
+        }),
+      });
+      const data = await res.json();
+      const freshUrl = data.checkoutUrl ?? displayCheckoutUrl;
+      if (freshUrl) {
+        window.location.href = freshUrl;
+      }
+    } catch {
+      const fallback = displayCheckoutUrl;
+      if (fallback) window.location.href = fallback;
+    } finally {
+      setCheckoutLoading(false);
+    }
   };
 
   // Loading state
@@ -456,23 +481,18 @@ export default function CartPage() {
               </p>
             </div>
 
-            {displayCheckoutUrl ? (
-              <a
-                href={displayCheckoutUrl}
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-foreground py-3 text-sm font-semibold text-background transition-colors hover:bg-foreground/90"
-              >
-                Checkout
-                <ArrowRight className="h-4 w-4" />
-              </a>
-            ) : (
-              <button
-                disabled
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-foreground py-3 text-sm font-semibold text-background opacity-50"
-              >
+            <button
+              onClick={handleCheckout}
+              disabled={checkoutLoading || (!displayCheckoutUrl && lines.length === 0)}
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-foreground py-3 text-sm font-semibold text-background transition-colors hover:bg-foreground/90 disabled:opacity-50"
+            >
+              {checkoutLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Checkout
-              </button>
-            )}
+              ) : (
+                <ArrowRight className="h-4 w-4" />
+              )}
+              Checkout
+            </button>
 
             {/* Trust signals */}
             <div className="mt-6 space-y-2.5">
