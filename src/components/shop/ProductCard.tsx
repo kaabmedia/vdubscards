@@ -29,9 +29,12 @@ export function ProductCard({ product, showSaleBadge }: ProductCardProps) {
   const firstVariant = product.variants?.edges?.[0]?.node;
   const variantId = firstVariant?.id;
   const quantityAvailable = firstVariant?.quantityAvailable;
+  const isOutOfStock =
+    firstVariant?.availableForSale === false ||
+    (quantityAvailable != null && quantityAvailable <= 0);
 
   const handleAddToCart = () => {
-    if (variantId) {
+    if (variantId && !isOutOfStock) {
       addLine(variantId, 1, quantityAvailable ?? undefined);
       setAddedToCart(true);
       setTimeout(() => setAddedToCart(false), 1500);
@@ -91,8 +94,17 @@ export function ProductCard({ product, showSaleBadge }: ProductCardProps) {
           )}
         </Link>
 
-        {/* Sale badge */}
-        {isOnSale && (
+        {/* Sold out overlay */}
+        {isOutOfStock && (
+          <div className="absolute inset-0 bg-white/60" />
+        )}
+
+        {/* Sale / Sold out badge */}
+        {isOutOfStock ? (
+          <span className="absolute left-2 top-2 rounded-md bg-gray-500 px-2 py-0.5 text-xs font-bold text-white shadow-sm">
+            Sold out
+          </span>
+        ) : isOnSale && (
           <span className="absolute left-2 top-2 rounded-md bg-sale px-2 py-0.5 text-xs font-bold text-sale-foreground shadow-sm animate-in fade-in">
             Sale
           </span>
@@ -146,8 +158,15 @@ export function ProductCard({ product, showSaleBadge }: ProductCardProps) {
           )}
         </div>
 
-        {/* Add to bag / Remove button */}
-        {inCart > 0 && atMax ? (
+        {/* Add to bag / Remove / Sold out button */}
+        {isOutOfStock ? (
+          <button
+            disabled
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium bg-gray-100 text-gray-400 cursor-not-allowed"
+          >
+            Sold out
+          </button>
+        ) : inCart > 0 && atMax ? (
           <button
             onClick={handleRemove}
             disabled={!variantId}

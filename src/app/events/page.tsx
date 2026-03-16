@@ -24,8 +24,7 @@ export default async function EventsPage() {
             Events
           </h1>
           <p className="mt-3 max-w-2xl text-gray-600">
-            Come say hi at an event! We regularly visit card fairs, markets and
-            expos across Europe. Check where we&apos;ll be next.
+            Come say hi at an event! We regularly visit card shows, expos and events across Europe! Check where we&apos;ll be next!
           </p>
         </div>
 
