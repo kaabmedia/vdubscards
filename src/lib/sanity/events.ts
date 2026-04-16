@@ -54,7 +54,7 @@ function getDateCardDisplay(
   return { monthAbbr, dayDisplay: `${start.getDate()}+` };
 }
 
-const EVENTS_QUERY = `*[_type == "event"] | order(sortOrder asc, startDate asc) {
+const EVENTS_QUERY = `*[_type == "event"] | order(startDate asc) {
   _id,
   name,
   location,
