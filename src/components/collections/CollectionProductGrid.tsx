@@ -6,7 +6,6 @@ import type { ShopifyProduct } from "@/lib/shopify/types";
 import type { ShopifyFilter } from "@/lib/shopify/types";
 import { ProductCard } from "@/components/shop/ProductCard";
 import {
-  Loader2,
   SlidersHorizontal,
   ChevronLeft,
   ChevronRight,
@@ -14,6 +13,7 @@ import {
   X,
   Check,
 } from "lucide-react";
+import { ProductGridSkeleton } from "@/components/shop/ProductCardSkeleton";
 
 const SORT_OPTIONS = [
   { value: "CREATED|true", label: "Newest first" },
@@ -675,13 +675,6 @@ export function CollectionProductGrid({
           </div>
         )}
 
-        {/* Loading */}
-        {(isPending || navigating) && (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-          </div>
-        )}
-
         {/* Empty state */}
         {showEmpty && (
           <div className="rounded-lg border border-dashed border-border px-6 py-20 text-center">
@@ -702,8 +695,10 @@ export function CollectionProductGrid({
           </div>
         )}
 
-        {/* Product grid */}
-        {products.length > 0 && (
+        {/* Product grid / skeleton */}
+        {(isPending || navigating) ? (
+          <ProductGridSkeleton count={products.length || 24} />
+        ) : products.length > 0 && (
           <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:gap-x-5 sm:gap-y-8 lg:grid-cols-3 xl:grid-cols-4">
             {products.map((product) => (
               <ProductCard

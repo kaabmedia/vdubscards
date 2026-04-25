@@ -236,6 +236,18 @@ export const COLLECTION_PAGE_QUERY = `
   }
 `;
 
+/** Minimale query om snel door cursors te skippen (alleen id, geen product details). */
+export const COLLECTION_CURSOR_SKIP_QUERY = `
+  query CollectionCursorSkip($handle: String!, $first: Int!, $after: String, $sortKey: ProductCollectionSortKeys = CREATED, $reverse: Boolean = true, $filters: [ProductFilter!]) {
+    collection(handle: $handle) {
+      products(first: $first, after: $after, sortKey: $sortKey, reverse: $reverse, filters: $filters) {
+        edges { node { id } }
+        pageInfo { hasNextPage endCursor }
+      }
+    }
+  }
+`;
+
 /** Lightweight query om te pagineren voor totaal aantal producten (geen totalCount in Storefront API). */
 export const COLLECTION_PRODUCTS_COUNT_QUERY = `
   query GetCollectionProductsCount($handle: String!, $first: Int!, $after: String, $sortKey: ProductCollectionSortKeys = CREATED, $reverse: Boolean = true, $filters: [ProductFilter!]) {

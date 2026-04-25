@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { shopifyFetch } from "@/lib/shopify/client";
-import { COLLECTION_PAGE_QUERY } from "@/lib/shopify/queries";
+import { COLLECTION_PAGE_QUERY, COLLECTION_CURSOR_SKIP_QUERY } from "@/lib/shopify/queries";
 import type { CollectionPageResponse } from "@/lib/shopify/types";
 
 export const dynamic = "force-dynamic";
@@ -91,56 +91,75 @@ export async function GET(
   try {
     if (targetPage != null && targetPage > 1 && !after) {
       const cacheKey = cursorCacheKey(handle, sortKey, reverse, filters);
-      let startFromPage = 1;
+
+      // Check if we already have the exact cursor cached
       let cursor: string | null = null;
+      let skipRemaining = (targetPage - 1) * PAGE_SIZE;
 
       const cached = getCachedCursor(cacheKey, targetPage);
       if (cached !== undefined) {
         cursor = cached;
-        startFromPage = targetPage;
+        skipRemaining = 0;
       } else {
+        // Find the closest cached cursor to avoid redundant work
         const entry = cursorCache.get(cacheKey);
         if (entry && Date.now() <= entry.expiresAt) {
           for (let p = targetPage - 1; p >= 1; p--) {
             const c = entry.cursors.get(p);
             if (c !== undefined) {
               cursor = c;
-              startFromPage = p;
+              skipRemaining = (targetPage - p) * PAGE_SIZE;
               break;
             }
           }
         }
       }
 
-      let products: unknown[] = [];
-      let pageInfo: { hasNextPage: boolean; endCursor: string | null } = {
-        hasNextPage: false,
-        endCursor: null,
-      };
-
-      for (let p = startFromPage; p <= targetPage; p++) {
-        const data = await shopifyFetch<CollectionPageResponse>({
-          query: COLLECTION_PAGE_QUERY,
+      // Skip ahead using max batch size (250) with lightweight cursor-only query
+      const SHOPIFY_MAX = 250;
+      while (skipRemaining > 0) {
+        const batchSize = Math.min(skipRemaining, SHOPIFY_MAX);
+        const skipData = await shopifyFetch<{ collection: { products: { edges: { node: { id: string } }[]; pageInfo: { hasNextPage: boolean; endCursor: string | null } } } | null }>({
+          query: COLLECTION_CURSOR_SKIP_QUERY,
           variables: {
             ...queryVars,
+            first: batchSize,
             ...(cursor && { after: cursor }),
           },
         });
 
-        const coll = data?.collection;
-        if (!coll) {
+        const skipColl = skipData?.collection;
+        if (!skipColl) {
           return NextResponse.json({ error: "Collection not found" }, { status: 404 });
         }
 
-        const edges = coll.products.edges;
-        products = edges.map((e: { node: unknown }) => e.node);
-        pageInfo = coll.products.pageInfo;
+        cursor = skipColl.products.pageInfo.endCursor;
+        skipRemaining -= batchSize;
 
-        setCachedCursor(cacheKey, p + 1, pageInfo.endCursor);
-        cursor = pageInfo.endCursor;
-
-        if (!pageInfo.hasNextPage && p < targetPage) break;
+        if (!skipColl.products.pageInfo.hasNextPage) break;
       }
+
+      // Cache the cursor for this page
+      setCachedCursor(cacheKey, targetPage, cursor);
+
+      // Fetch the actual page data
+      const data = await shopifyFetch<CollectionPageResponse>({
+        query: COLLECTION_PAGE_QUERY,
+        variables: {
+          ...queryVars,
+          ...(cursor && { after: cursor }),
+        },
+      });
+
+      const coll = data?.collection;
+      if (!coll) {
+        return NextResponse.json({ error: "Collection not found" }, { status: 404 });
+      }
+
+      const products = coll.products.edges.map((e: { node: unknown }) => e.node);
+      const pageInfo = coll.products.pageInfo;
+
+      setCachedCursor(cacheKey, targetPage + 1, pageInfo.endCursor);
 
       return NextResponse.json({ products, pageInfo });
     }

@@ -491,5 +491,70 @@
     "name": "countdown",
     "type": "document",
     "title": "Home"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Contact us",
+        "name": "heading",
+        "type": "string",
+        "title": "Koptekst"
+      },
+      {
+        "rows": 3,
+        "initialValue": "Have a question about your order, our products or need support? We respond quickly and are happy to help.",
+        "name": "subheading",
+        "type": "text",
+        "title": "Ondertitel"
+      },
+      {
+        "initialValue": "Email us",
+        "name": "emailTitle",
+        "type": "string",
+        "title": "E-mail kaart titel"
+      },
+      {
+        "rows": 3,
+        "initialValue": "For product questions, order updates or return requests. We typically respond within 1 business day.",
+        "name": "emailDescription",
+        "type": "text",
+        "title": "E-mail kaart beschrijving"
+      },
+      {
+        "initialValue": "Vdubscards@hotmail.com",
+        "name": "emailAddress",
+        "type": "string",
+        "title": "E-mailadres"
+      },
+      {
+        "initialValue": "Visit us",
+        "name": "visitTitle",
+        "type": "string",
+        "title": "Bezoek kaart titel"
+      },
+      {
+        "rows": 3,
+        "initialValue": "Find us at events and markets across Europe. Check our Events section for upcoming dates.",
+        "name": "visitDescription",
+        "type": "text",
+        "title": "Bezoek kaart beschrijving"
+      },
+      {
+        "initialValue": "Response times",
+        "name": "responseTitle",
+        "type": "string",
+        "title": "Reactietijd kaart titel"
+      },
+      {
+        "rows": 3,
+        "initialValue": "We aim to respond to all emails within 1 business day. Our customer service is available during business hours (CET).",
+        "name": "responseDescription",
+        "type": "text",
+        "title": "Reactietijd kaart beschrijving"
+      }
+    ],
+    "name": "contactPage",
+    "type": "document",
+    "title": "Contact Pagina"
   }
 ]
