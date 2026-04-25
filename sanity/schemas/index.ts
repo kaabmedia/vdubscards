@@ -4,7 +4,8 @@ import { page } from "./page";
 import { blockContent } from "./blockContent";
 import { event } from "./event";
 import { countdown } from "./countdown";
+import { contactPage } from "./contactPage";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [hero, blockContent, page, event, countdown],
+  types: [hero, blockContent, page, event, countdown, contactPage],
 };

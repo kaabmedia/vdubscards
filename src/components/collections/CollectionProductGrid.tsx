@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useCallback } from "react";
+import { useState, useTransition, useCallback, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { ShopifyProduct } from "@/lib/shopify/types";
 import type { ShopifyFilter } from "@/lib/shopify/types";
@@ -139,6 +139,26 @@ export function CollectionProductGrid({
   const sortSelectValue = `${sortValue}|${reverseParam}`;
   const activeFilters = getActiveFilters(searchParams);
 
+  // Key that uniquely identifies the current browse context (handle + sort + filters)
+  const sessionKey = `cpg_${handle}_${sortValue}_${reverseParam}_${JSON.stringify(activeFilters)}`;
+
+  // Restore saved page on mount (after navigating back from a product detail page)
+  const hasRestoredRef = useRef(false);
+  useEffect(() => {
+    if (hasRestoredRef.current) return;
+    hasRestoredRef.current = true;
+    try {
+      const saved = sessionStorage.getItem(sessionKey);
+      if (saved) {
+        const { p } = JSON.parse(saved) as { p: number };
+        if (typeof p === "number" && p > 1) {
+          goToPage(p);
+        }
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const buildParams = useCallback(
     (overrides: { sortKey?: string; reverse?: string; filters?: Record<string, unknown>[] } = {}) => {
       const params = new URLSearchParams();
@@ -163,6 +183,7 @@ export function CollectionProductGrid({
     setCursorHistory([null]);
     setEndCursorHistory([]);
     setMaxDiscoveredPage(1);
+    try { sessionStorage.removeItem(sessionKey); } catch {}
   }
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -265,6 +286,10 @@ export function CollectionProductGrid({
         }
 
         window.scrollTo({ top: 0, behavior: "smooth" });
+
+        try {
+          sessionStorage.setItem(sessionKey, JSON.stringify({ p: targetPage }));
+        } catch {}
       }
     } finally {
       setNavigating(false);
