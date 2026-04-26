@@ -1,17 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Star,
-  Users,
-  Shield,
-  Calendar,
-  ShieldCheck,
-  Heart,
-  UsersRound,
-  ArrowRight,
+  Star, Users, Shield, Calendar, ShieldCheck, Heart,
+  UsersRound, ArrowRight, Trophy, Package, Truck, Sparkles,
+  type LucideIcon,
 } from "lucide-react";
 import type { Metadata } from "next";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
+import { getAboutPage } from "@/lib/sanity/aboutPage";
+import { urlFor } from "@/lib/sanity/image";
 
 export const metadata: Metadata = {
   title: "About us | V-Dub's Cards",
@@ -19,32 +16,19 @@ export const metadata: Metadata = {
     "V-Dub's Cards - A family business built on passion for sports cards and collectibles. Authentic, personal service, community.",
 };
 
-const stats = [
-  { icon: Star, value: "10,000+", label: "Cards in stock" },
-  { icon: Users, value: "500+", label: "Happy collectors" },
-  { icon: Shield, value: "100%", label: "Authentic" },
-  { icon: Calendar, value: "Daily", label: "New arrivals" },
-];
+const ICON_MAP: Record<string, LucideIcon> = {
+  Star, Users, Shield, Calendar, ShieldCheck, Heart,
+  UsersRound, Trophy, Package, Truck, Sparkles,
+};
 
-const values = [
-  {
-    icon: ShieldCheck,
-    title: "Authenticity",
-    description: "Every card is carefully verified to ensure you receive genuine, high-quality collectibles.",
-  },
-  {
-    icon: Heart,
-    title: "Personal Service",
-    description: "We treat every customer like family and every order with the utmost care and attention.",
-  },
-  {
-    icon: UsersRound,
-    title: "Community",
-    description: "We're building a community of passionate collectors who share the love for the hobby.",
-  },
-];
+function DynamicIcon({ name, className }: { name: string; className?: string }) {
+  const Icon = ICON_MAP[name] ?? Star;
+  return <Icon className={className} />;
+}
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const d = await getAboutPage();
+
   return (
     <div>
       {/* Hero */}
@@ -53,36 +37,30 @@ export default function AboutPage() {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
               <span className="inline-block rounded-full bg-primary/20 px-4 py-1.5 text-sm font-medium text-gray-900">
-                A Family Business
+                {d.heroBadge}
               </span>
               <h1 className="mt-4 text-3xl font-bold text-gray-900 md:text-4xl lg:text-5xl">
-                Welcome to V-Dub&apos;s
+                {d.heroTitle}
               </h1>
-              <p className="mt-6 max-w-lg text-gray-600">
-                At V-Dub&apos;s Cards, everything revolves around our passion for
-                sports and the thrill of collecting. What started as a hobby
-                quickly grew into a true family business. With a deep love for
-                sports and an eye for quality, we offer a carefully curated
-                selection of sports cards and collectibles.
-              </p>
+              <p className="mt-6 max-w-lg text-gray-600">{d.heroText}</p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link
-                  href="/collections/all"
+                  href={d.heroCta1Link}
                   className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                 >
-                  Shop Collection
+                  {d.heroCta1Text}
                 </Link>
                 <Link
-                  href="/contact"
+                  href={d.heroCta2Link}
                   className="inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-3 text-sm font-semibold text-gray-900 transition-colors hover:bg-primary/10"
                 >
-                  Get in Touch
+                  {d.heroCta2Text}
                 </Link>
               </div>
             </div>
             <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-gray-200">
               <Image
-                src="/about-1.jpeg"
+                src={d.heroImage ? urlFor(d.heroImage).width(800).url() : "/about-1.jpeg"}
                 alt="V-Dub's Cards team"
                 fill
                 className="object-cover"
@@ -98,12 +76,9 @@ export default function AboutPage() {
       <section className="bg-gray-50 py-12 md:py-16">
         <div className="container mx-auto px-4">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map((item) => (
-              <div
-                key={item.label}
-                className="flex flex-col items-center text-center"
-              >
-                <item.icon className="h-8 w-8 text-primary" />
+            {d.stats.map((item) => (
+              <div key={item.label} className="flex flex-col items-center text-center">
+                <DynamicIcon name={item.icon} className="h-8 w-8 text-primary" />
                 <span className="mt-2 text-2xl font-bold text-gray-900 md:text-3xl">
                   {item.value}
                 </span>
@@ -120,7 +95,7 @@ export default function AboutPage() {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div className="relative order-2 aspect-[4/5] overflow-hidden rounded-xl bg-gray-200 lg:order-1">
               <Image
-                src="/about-2.jpeg"
+                src={d.storyImage ? urlFor(d.storyImage).width(800).url() : "/about-2.jpeg"}
                 alt="V-Dub's Cards family"
                 fill
                 className="object-cover"
@@ -129,25 +104,17 @@ export default function AboutPage() {
             </div>
             <div className="order-1 lg:order-2">
               <span className="inline-block rounded-full bg-primary/20 px-4 py-1.5 text-sm font-medium text-gray-900">
-                Our Story
+                {d.storyBadge}
               </span>
               <h2 className="mt-4 text-2xl font-bold text-gray-900 md:text-3xl">
-                A Family United by Passion
+                {d.storyTitle}
               </h2>
-              <p className="mt-6 max-w-lg text-gray-600">
-                V-Dub&apos;s Cards was founded by a family who shares a love for
-                sports and collecting. What began at the kitchen table, trading
-                cards and sharing memories, has grown into a webshop where we
-                connect with fellow collectors every day. As a family business,
-                we value personal service, trust, and building lasting
-                relationships with our customers. Every order is handled with
-                care—just as if it were part of our own collection.
-              </p>
+              <p className="mt-6 max-w-lg text-gray-600">{d.storyText}</p>
               <Link
-                href="/collections/all"
+                href={d.storyCtaLink}
                 className="mt-6 inline-flex items-center gap-2 font-medium text-primary hover:underline"
               >
-                Explore our collection
+                {d.storyCtaText}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -160,19 +127,17 @@ export default function AboutPage() {
         <div className="container mx-auto px-4">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">
-              Our Values
+              {d.valuesSectionTitle}
             </h2>
-            <p className="mt-2 text-gray-600">
-              What makes V-Dub&apos;s different.
-            </p>
+            <p className="mt-2 text-gray-600">{d.valuesSectionSubtitle}</p>
           </div>
           <div className="mt-12 grid gap-8 md:grid-cols-3">
-            {values.map((item) => (
+            {d.values.map((item) => (
               <div
                 key={item.title}
                 className="rounded-xl border border-gray-200 bg-white p-8 text-center"
               >
-                <item.icon className="mx-auto h-10 w-10 text-primary" />
+                <DynamicIcon name={item.icon} className="mx-auto h-10 w-10 text-primary" />
                 <h3 className="mt-4 font-bold text-gray-900">{item.title}</h3>
                 <p className="mt-2 text-sm text-gray-600">{item.description}</p>
               </div>
@@ -181,36 +146,29 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* For Collectors, by Collectors */}
+      {/* Community */}
       <section className="bg-white py-12 md:py-20">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-2xl text-center">
             <span className="inline-block rounded-full bg-primary/20 px-4 py-1.5 text-sm font-medium text-gray-900">
-              Community
+              {d.communityBadge}
             </span>
             <h2 className="mt-4 text-2xl font-bold text-gray-900 md:text-3xl">
-              For Collectors, by Collectors
+              {d.communityTitle}
             </h2>
-            <p className="mt-6 text-gray-600">
-              Whether you&apos;re just starting your collection or you&apos;re a
-              seasoned hobbyist, V-Dub&apos;s Cards is your trusted destination. We
-              stay up to date with the latest releases and proudly offer rare
-              finds from the past. We&apos;re always happy to offer guidance,
-              track down a specific card, or simply talk shop. V-Dub&apos;s Cards
-              is more than a store—it&apos;s a community built on shared passion.
-            </p>
+            <p className="mt-6 text-gray-600">{d.communityText}</p>
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link
-                href="/collections/all"
+                href={d.communityCta1Link}
                 className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
               >
-                Start Collecting
+                {d.communityCta1Text}
               </Link>
               <Link
-                href="/"
+                href={d.communityCta2Link}
                 className="inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-3 text-sm font-semibold text-gray-900 transition-colors hover:bg-primary/10"
               >
-                Join Us at Events
+                {d.communityCta2Text}
               </Link>
             </div>
           </div>

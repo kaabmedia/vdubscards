@@ -556,5 +556,352 @@
     "name": "contactPage",
     "type": "document",
     "title": "Contact Pagina"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "A Family Business",
+        "name": "heroBadge",
+        "type": "string",
+        "title": "Badge tekst"
+      },
+      {
+        "initialValue": "Welcome to V-Dub's",
+        "name": "heroTitle",
+        "type": "string",
+        "title": "Titel"
+      },
+      {
+        "rows": 4,
+        "initialValue": "At V-Dub's Cards, everything revolves around our passion for sports and the thrill of collecting. What started as a hobby quickly grew into a true family business. With a deep love for sports and an eye for quality, we offer a carefully curated selection of sports cards and collectibles.",
+        "name": "heroText",
+        "type": "text",
+        "title": "Tekst"
+      },
+      {
+        "initialValue": "Shop Collection",
+        "name": "heroCta1Text",
+        "type": "string",
+        "title": "Knop 1 tekst"
+      },
+      {
+        "initialValue": "/collections/all",
+        "name": "heroCta1Link",
+        "type": "string",
+        "title": "Knop 1 link"
+      },
+      {
+        "initialValue": "Get in Touch",
+        "name": "heroCta2Text",
+        "type": "string",
+        "title": "Knop 2 tekst"
+      },
+      {
+        "initialValue": "/contact",
+        "name": "heroCta2Link",
+        "type": "string",
+        "title": "Knop 2 link"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "heroImage",
+        "type": "image",
+        "title": "Afbeelding"
+      },
+      {
+        "initialValue": [
+          {
+            "_key": "s1",
+            "icon": "Star",
+            "value": "10,000+",
+            "label": "Cards in stock"
+          },
+          {
+            "_key": "s2",
+            "icon": "Users",
+            "value": "500+",
+            "label": "Happy collectors"
+          },
+          {
+            "_key": "s3",
+            "icon": "Shield",
+            "value": "100%",
+            "label": "Authentic"
+          },
+          {
+            "_key": "s4",
+            "icon": "Calendar",
+            "value": "Daily",
+            "label": "New arrivals"
+          }
+        ],
+        "of": [
+          {
+            "fields": [
+              {
+                "options": {
+                  "list": [
+                    {
+                      "title": "Star",
+                      "value": "Star"
+                    },
+                    {
+                      "title": "Users",
+                      "value": "Users"
+                    },
+                    {
+                      "title": "Shield",
+                      "value": "Shield"
+                    },
+                    {
+                      "title": "Calendar",
+                      "value": "Calendar"
+                    },
+                    {
+                      "title": "ShieldCheck",
+                      "value": "ShieldCheck"
+                    },
+                    {
+                      "title": "Heart",
+                      "value": "Heart"
+                    },
+                    {
+                      "title": "UsersRound",
+                      "value": "UsersRound"
+                    },
+                    {
+                      "title": "Trophy",
+                      "value": "Trophy"
+                    },
+                    {
+                      "title": "Package",
+                      "value": "Package"
+                    },
+                    {
+                      "title": "Truck",
+                      "value": "Truck"
+                    },
+                    {
+                      "title": "Sparkles",
+                      "value": "Sparkles"
+                    }
+                  ]
+                },
+                "name": "icon",
+                "type": "string",
+                "title": "Icoon"
+              },
+              {
+                "name": "value",
+                "type": "string",
+                "title": "Waarde"
+              },
+              {
+                "name": "label",
+                "type": "string"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "stats",
+        "type": "array"
+      },
+      {
+        "initialValue": "Our Story",
+        "name": "storyBadge",
+        "type": "string",
+        "title": "Badge tekst"
+      },
+      {
+        "initialValue": "A Family United by Passion",
+        "name": "storyTitle",
+        "type": "string",
+        "title": "Titel"
+      },
+      {
+        "rows": 5,
+        "initialValue": "V-Dub's Cards was founded by a family who shares a love for sports and collecting. What began at the kitchen table, trading cards and sharing memories, has grown into a webshop where we connect with fellow collectors every day. As a family business, we value personal service, trust, and building lasting relationships with our customers. Every order is handled with care—just as if it were part of our own collection.",
+        "name": "storyText",
+        "type": "text",
+        "title": "Tekst"
+      },
+      {
+        "initialValue": "Explore our collection",
+        "name": "storyCtaText",
+        "type": "string",
+        "title": "Link tekst"
+      },
+      {
+        "initialValue": "/collections/all",
+        "name": "storyCtaLink",
+        "type": "string",
+        "title": "Link"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "storyImage",
+        "type": "image",
+        "title": "Afbeelding"
+      },
+      {
+        "initialValue": "Our Values",
+        "name": "valuesSectionTitle",
+        "type": "string",
+        "title": "Sectie titel"
+      },
+      {
+        "initialValue": "What makes V-Dub's different.",
+        "name": "valuesSectionSubtitle",
+        "type": "string",
+        "title": "Sectie ondertitel"
+      },
+      {
+        "initialValue": [
+          {
+            "_key": "v1",
+            "icon": "ShieldCheck",
+            "title": "Authenticity",
+            "description": "Every card is carefully verified to ensure you receive genuine, high-quality collectibles."
+          },
+          {
+            "_key": "v2",
+            "icon": "Heart",
+            "title": "Personal Service",
+            "description": "We treat every customer like family and every order with the utmost care and attention."
+          },
+          {
+            "_key": "v3",
+            "icon": "UsersRound",
+            "title": "Community",
+            "description": "We're building a community of passionate collectors who share the love for the hobby."
+          }
+        ],
+        "of": [
+          {
+            "fields": [
+              {
+                "options": {
+                  "list": [
+                    {
+                      "title": "Star",
+                      "value": "Star"
+                    },
+                    {
+                      "title": "Users",
+                      "value": "Users"
+                    },
+                    {
+                      "title": "Shield",
+                      "value": "Shield"
+                    },
+                    {
+                      "title": "Calendar",
+                      "value": "Calendar"
+                    },
+                    {
+                      "title": "ShieldCheck",
+                      "value": "ShieldCheck"
+                    },
+                    {
+                      "title": "Heart",
+                      "value": "Heart"
+                    },
+                    {
+                      "title": "UsersRound",
+                      "value": "UsersRound"
+                    },
+                    {
+                      "title": "Trophy",
+                      "value": "Trophy"
+                    },
+                    {
+                      "title": "Package",
+                      "value": "Package"
+                    },
+                    {
+                      "title": "Truck",
+                      "value": "Truck"
+                    },
+                    {
+                      "title": "Sparkles",
+                      "value": "Sparkles"
+                    }
+                  ]
+                },
+                "name": "icon",
+                "type": "string",
+                "title": "Icoon"
+              },
+              {
+                "name": "title",
+                "type": "string",
+                "title": "Titel"
+              },
+              {
+                "rows": 3,
+                "name": "description",
+                "type": "text",
+                "title": "Beschrijving"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "values",
+        "type": "array",
+        "title": "Waarden"
+      },
+      {
+        "initialValue": "Community",
+        "name": "communityBadge",
+        "type": "string",
+        "title": "Badge tekst"
+      },
+      {
+        "initialValue": "For Collectors, by Collectors",
+        "name": "communityTitle",
+        "type": "string",
+        "title": "Titel"
+      },
+      {
+        "rows": 5,
+        "initialValue": "Whether you're just starting your collection or you're a seasoned hobbyist, V-Dub's Cards is your trusted destination. We stay up to date with the latest releases and proudly offer rare finds from the past. We're always happy to offer guidance, track down a specific card, or simply talk shop. V-Dub's Cards is more than a store—it's a community built on shared passion.",
+        "name": "communityText",
+        "type": "text",
+        "title": "Tekst"
+      },
+      {
+        "initialValue": "Start Collecting",
+        "name": "communityCta1Text",
+        "type": "string",
+        "title": "Knop 1 tekst"
+      },
+      {
+        "initialValue": "/collections/all",
+        "name": "communityCta1Link",
+        "type": "string",
+        "title": "Knop 1 link"
+      },
+      {
+        "initialValue": "Join Us at Events",
+        "name": "communityCta2Text",
+        "type": "string",
+        "title": "Knop 2 tekst"
+      },
+      {
+        "initialValue": "/events",
+        "name": "communityCta2Link",
+        "type": "string",
+        "title": "Knop 2 link"
+      }
+    ],
+    "name": "aboutPage",
+    "type": "document",
+    "title": "About Pagina"
   }
 ]
