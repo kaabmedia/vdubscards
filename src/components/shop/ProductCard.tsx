@@ -94,11 +94,6 @@ export function ProductCard({ product, showSaleBadge }: ProductCardProps) {
           )}
         </Link>
 
-        {/* Sold out overlay */}
-        {isOutOfStock && (
-          <div className="absolute inset-0 bg-white/60" />
-        )}
-
         {/* Sale / Sold out badge */}
         {isOutOfStock ? (
           <span className="absolute left-2 top-2 rounded-md bg-gray-500 px-2 py-0.5 text-xs font-bold text-white shadow-sm">
