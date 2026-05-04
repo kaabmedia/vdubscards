@@ -67,12 +67,12 @@ function HomeEventsSliderInner({ images }: HomeEventsSliderProps) {
 
   return (
     <div
-      className="group/slider relative h-full overflow-hidden rounded-xl"
+      className="group/slider relative h-full w-full overflow-hidden rounded-xl"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <div ref={emblaRef} className="h-full overflow-hidden">
-        <div className="flex h-full">
+      <div ref={emblaRef} className="h-full w-full overflow-hidden">
+        <div className="flex h-full w-full">
           {images.map((img, i) => (
             <div
               key={i}

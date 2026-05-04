@@ -36,8 +36,14 @@ const DEFAULTS: PrivacyPageData = {
 export async function getPrivacyPage(): Promise<PrivacyPageData> {
   if (!sanityClient) return DEFAULTS;
   try {
-    const data = await sanityClient.fetch<PrivacyPageData | null>(QUERY);
-    return data ? { ...DEFAULTS, ...data } : DEFAULTS;
+    const data = await sanityClient.fetch<Partial<PrivacyPageData> | null>(QUERY);
+    if (!data) return DEFAULTS;
+    return {
+      pageTitle: data.pageTitle || DEFAULTS.pageTitle,
+      lastUpdated: data.lastUpdated || DEFAULTS.lastUpdated,
+      intro: data.intro || DEFAULTS.intro,
+      sections: data.sections?.length ? data.sections : DEFAULTS.sections,
+    };
   } catch {
     return DEFAULTS;
   }

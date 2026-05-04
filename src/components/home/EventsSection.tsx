@@ -112,7 +112,7 @@ export function EventsSection({
         {/* Two-column: slider left, events right — fixed height so they align */}
         <div className="grid gap-5 md:grid-cols-2">
           {/* Slider / fallback */}
-          <div className="h-[340px] md:h-[380px]">
+          <div className="min-w-0 overflow-hidden h-[340px] md:h-[380px]">
             {hasSlider ? (
               <HomeEventsSlider images={sliderImages} />
             ) : (
@@ -132,7 +132,7 @@ export function EventsSection({
           </div>
 
           {/* Events list — same fixed height, cards stretch evenly */}
-          <div className="flex flex-col gap-4 md:h-[380px]">
+          <div className="min-w-0 flex flex-col gap-4 md:h-[380px]">
             {events.map((event, index) => {
               const isFirstUpcoming = index === 0;
               const Wrapper = event.link ? "a" : "div";

@@ -26,8 +26,13 @@ const DEFAULTS: FaqPageData = {
 export async function getFaqPage(): Promise<FaqPageData> {
   if (!sanityClient) return DEFAULTS;
   try {
-    const data = await sanityClient.fetch<FaqPageData | null>(QUERY);
-    return data ? { ...DEFAULTS, ...data } : DEFAULTS;
+    const data = await sanityClient.fetch<Partial<FaqPageData> | null>(QUERY);
+    if (!data) return DEFAULTS;
+    return {
+      pageTitle: data.pageTitle || DEFAULTS.pageTitle,
+      subtitle: data.subtitle || DEFAULTS.subtitle,
+      items: data.items?.length ? data.items : DEFAULTS.items,
+    };
   } catch {
     return DEFAULTS;
   }

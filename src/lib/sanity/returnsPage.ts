@@ -27,8 +27,14 @@ const DEFAULTS: ReturnsPageData = {
 export async function getReturnsPage(): Promise<ReturnsPageData> {
   if (!sanityClient) return DEFAULTS;
   try {
-    const data = await sanityClient.fetch<ReturnsPageData | null>(QUERY);
-    return data ? { ...DEFAULTS, ...data } : DEFAULTS;
+    const data = await sanityClient.fetch<Partial<ReturnsPageData> | null>(QUERY);
+    if (!data) return DEFAULTS;
+    return {
+      pageTitle: data.pageTitle || DEFAULTS.pageTitle,
+      subtitle: data.subtitle || DEFAULTS.subtitle,
+      highlightText: data.highlightText || DEFAULTS.highlightText,
+      cards: data.cards?.length ? data.cards : DEFAULTS.cards,
+    };
   } catch {
     return DEFAULTS;
   }

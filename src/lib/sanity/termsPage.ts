@@ -40,8 +40,13 @@ const DEFAULTS: TermsPageData = {
 export async function getTermsPage(): Promise<TermsPageData> {
   if (!sanityClient) return DEFAULTS;
   try {
-    const data = await sanityClient.fetch<TermsPageData | null>(QUERY);
-    return data ? { ...DEFAULTS, ...data } : DEFAULTS;
+    const data = await sanityClient.fetch<Partial<TermsPageData> | null>(QUERY);
+    if (!data) return DEFAULTS;
+    return {
+      pageTitle: data.pageTitle || DEFAULTS.pageTitle,
+      lastUpdated: data.lastUpdated || DEFAULTS.lastUpdated,
+      sections: data.sections?.length ? data.sections : DEFAULTS.sections,
+    };
   } catch {
     return DEFAULTS;
   }

@@ -903,5 +903,324 @@
     "name": "aboutPage",
     "type": "document",
     "title": "About Pagina"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Shipping & Delivery",
+        "name": "pageTitle",
+        "type": "string",
+        "title": "Paginatitel"
+      },
+      {
+        "rows": 3,
+        "initialValue": "At V-Dub's Cards we care about getting your orders to you safely and on time. We ship within the EU and worldwide. Shipping costs, delivery times, and customs vary by region.",
+        "name": "subtitle",
+        "type": "text",
+        "title": "Ondertitel"
+      },
+      {
+        "initialValue": "Free Standard Shipping on orders over €125.00",
+        "name": "freeShippingText",
+        "type": "string",
+        "title": "Gratis verzending banner tekst"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "region",
+                "type": "string",
+                "title": "Regio"
+              },
+              {
+                "of": [
+                  {
+                    "fields": [
+                      {
+                        "name": "method",
+                        "type": "string",
+                        "title": "Methode"
+                      },
+                      {
+                        "name": "days",
+                        "type": "string",
+                        "title": "Levertijd"
+                      },
+                      {
+                        "name": "price",
+                        "type": "string",
+                        "title": "Prijs"
+                      }
+                    ],
+                    "type": "object"
+                  }
+                ],
+                "name": "options",
+                "type": "array",
+                "title": "Opties"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "shippingMethods",
+        "type": "array",
+        "title": "Verzendmethoden (kaarten)"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "region",
+                "type": "string",
+                "title": "Regio"
+              },
+              {
+                "name": "method",
+                "type": "string",
+                "title": "Methode"
+              },
+              {
+                "name": "days",
+                "type": "string",
+                "title": "Levertijd"
+              },
+              {
+                "name": "carrier",
+                "type": "string",
+                "title": "Vervoerder"
+              },
+              {
+                "name": "price",
+                "type": "string",
+                "title": "Prijs"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "tableRows",
+        "type": "array",
+        "title": "Overzichtstabel rijen"
+      },
+      {
+        "initialValue": "Delivery times are estimates and may vary due to customs or carrier delays.",
+        "name": "tableDisclaimer",
+        "type": "string",
+        "title": "Tabel disclaimer"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "title",
+                "type": "string",
+                "title": "Titel"
+              },
+              {
+                "rows": 3,
+                "name": "content",
+                "type": "text",
+                "title": "Inhoud"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "infoCards",
+        "type": "array",
+        "title": "Informatie kaarten"
+      }
+    ],
+    "name": "shippingPage",
+    "type": "document",
+    "title": "Verzending Pagina"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Returns & Refunds",
+        "name": "pageTitle",
+        "type": "string",
+        "title": "Paginatitel"
+      },
+      {
+        "rows": 2,
+        "initialValue": "Clear and simple. Read how we process refunds, exchanges and gifts, and what to do if a refund is late or missing.",
+        "name": "subtitle",
+        "type": "text",
+        "title": "Ondertitel"
+      },
+      {
+        "initialValue": "Returns are inspected within 1-2 business days after receipt",
+        "name": "highlightText",
+        "type": "string",
+        "title": "Banner tekst"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "title",
+                "type": "string",
+                "title": "Titel"
+              },
+              {
+                "rows": 4,
+                "name": "content",
+                "type": "text",
+                "title": "Inhoud"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "cards",
+        "type": "array",
+        "title": "Beleidskaarten"
+      }
+    ],
+    "name": "returnsPage",
+    "type": "document",
+    "title": "Retouren Pagina"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Frequently Asked Questions",
+        "name": "pageTitle",
+        "type": "string",
+        "title": "Paginatitel"
+      },
+      {
+        "rows": 3,
+        "initialValue": "Quick answers to the most common questions we hear from collectors. If you still need help, contact us and we will respond quickly.",
+        "name": "subtitle",
+        "type": "text",
+        "title": "Ondertitel"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "question",
+                "type": "string",
+                "title": "Vraag"
+              },
+              {
+                "rows": 4,
+                "name": "answer",
+                "type": "text",
+                "title": "Antwoord"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "items",
+        "type": "array",
+        "title": "Vragen & Antwoorden"
+      }
+    ],
+    "name": "faqPage",
+    "type": "document",
+    "title": "FAQ Pagina"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Privacy Policy",
+        "name": "pageTitle",
+        "type": "string",
+        "title": "Paginatitel"
+      },
+      {
+        "initialValue": "27 March 2024",
+        "name": "lastUpdated",
+        "type": "string",
+        "title": "Laatste update"
+      },
+      {
+        "rows": 4,
+        "initialValue": "This Privacy Policy describes how V-Dub's Cards (\"we\", \"us\", \"our\") collects, uses, and discloses your personal information when you use our services or make purchases from our store. By using our services, you agree to the terms of this policy.",
+        "name": "intro",
+        "type": "text",
+        "title": "Introductie tekst"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "title",
+                "type": "string",
+                "title": "Titel"
+              },
+              {
+                "rows": 5,
+                "name": "content",
+                "type": "text",
+                "title": "Inhoud"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "sections",
+        "type": "array",
+        "title": "Secties"
+      }
+    ],
+    "name": "privacyPage",
+    "type": "document",
+    "title": "Privacy Pagina"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Terms & Conditions",
+        "name": "pageTitle",
+        "type": "string",
+        "title": "Paginatitel"
+      },
+      {
+        "initialValue": "27 March 2024",
+        "name": "lastUpdated",
+        "type": "string",
+        "title": "Laatste update"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "title",
+                "type": "string",
+                "title": "Titel"
+              },
+              {
+                "rows": 5,
+                "name": "content",
+                "type": "text",
+                "title": "Inhoud"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "sections",
+        "type": "array",
+        "title": "Secties"
+      }
+    ],
+    "name": "termsPage",
+    "type": "document",
+    "title": "Algemene Voorwaarden Pagina"
   }
 ]

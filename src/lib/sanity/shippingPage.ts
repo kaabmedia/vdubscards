@@ -56,8 +56,17 @@ const DEFAULTS: ShippingPageData = {
 export async function getShippingPage(): Promise<ShippingPageData> {
   if (!sanityClient) return DEFAULTS;
   try {
-    const data = await sanityClient.fetch<ShippingPageData | null>(QUERY);
-    return data ? { ...DEFAULTS, ...data } : DEFAULTS;
+    const data = await sanityClient.fetch<Partial<ShippingPageData> | null>(QUERY);
+    if (!data) return DEFAULTS;
+    return {
+      pageTitle: data.pageTitle || DEFAULTS.pageTitle,
+      subtitle: data.subtitle || DEFAULTS.subtitle,
+      freeShippingText: data.freeShippingText || DEFAULTS.freeShippingText,
+      shippingMethods: data.shippingMethods?.length ? data.shippingMethods : DEFAULTS.shippingMethods,
+      tableRows: data.tableRows?.length ? data.tableRows : DEFAULTS.tableRows,
+      tableDisclaimer: data.tableDisclaimer || DEFAULTS.tableDisclaimer,
+      infoCards: data.infoCards?.length ? data.infoCards : DEFAULTS.infoCards,
+    };
   } catch {
     return DEFAULTS;
   }
