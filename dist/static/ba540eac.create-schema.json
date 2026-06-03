@@ -39,12 +39,6 @@
         "marks": {
           "annotations": [
             {
-              "i18nTitleKey": "inputs.portable-text.annotation.link",
-              "options": {
-                "modal": {
-                  "type": "popover"
-                }
-              },
               "fields": [
                 {
                   "validation": [
@@ -56,11 +50,9 @@
                             "options": {
                               "scheme": [
                                 "/^http$/",
-                                "/^https$/",
-                                "/^tel$/",
-                                "/^mailto$/"
+                                "/^https$/"
                               ],
-                              "allowRelative": true,
+                              "allowRelative": false,
                               "relativeOnly": false,
                               "allowCredentials": false
                             }
@@ -70,20 +62,38 @@
                       "level": "error"
                     }
                   ],
-                  "description": "A valid web, email, phone, or relative link.",
                   "name": "href",
                   "type": "url",
-                  "title": "Link"
+                  "title": "URL"
+                },
+                {
+                  "initialValue": true,
+                  "name": "blank",
+                  "type": "boolean",
+                  "title": "Open in new tab"
                 }
               ],
               "name": "link",
-              "type": "object"
+              "type": "object",
+              "title": "External link"
+            },
+            {
+              "fields": [
+                {
+                  "name": "href",
+                  "type": "string",
+                  "title": "Path (e.g. /collections/soccer-cards)"
+                }
+              ],
+              "name": "internalLink",
+              "type": "object",
+              "title": "Internal link"
             }
           ],
           "decorators": [
             {
               "value": "strong",
-              "title": "Strong"
+              "title": "Bold"
             },
             {
               "value": "em",
@@ -106,21 +116,17 @@
         "lists": [
           {
             "value": "bullet",
-            "title": "Bulleted list"
+            "title": "Bullet"
           },
           {
             "value": "number",
-            "title": "Numbered list"
+            "title": "Numbered"
           }
         ],
         "styles": [
           {
             "value": "normal",
             "title": "Normal"
-          },
-          {
-            "value": "h1",
-            "title": "Heading 1"
           },
           {
             "value": "h2",
@@ -135,14 +141,6 @@
             "title": "Heading 4"
           },
           {
-            "value": "h5",
-            "title": "Heading 5"
-          },
-          {
-            "value": "h6",
-            "title": "Heading 6"
-          },
-          {
             "value": "blockquote",
             "title": "Quote"
           }
@@ -154,7 +152,58 @@
         "options": {
           "hotspot": true
         },
+        "fields": [
+          {
+            "description": "Important for SEO and accessibility",
+            "name": "alt",
+            "type": "string",
+            "title": "Alt text"
+          },
+          {
+            "name": "caption",
+            "type": "string",
+            "title": "Caption (optional)"
+          }
+        ],
         "type": "image"
+      },
+      {
+        "fields": [
+          {
+            "options": {
+              "list": [
+                {
+                  "title": "💡 Tip",
+                  "value": "tip"
+                },
+                {
+                  "title": "ℹ️ Info",
+                  "value": "info"
+                },
+                {
+                  "title": "⚠️ Warning",
+                  "value": "warning"
+                },
+                {
+                  "title": "✅ Success",
+                  "value": "success"
+                }
+              ],
+              "layout": "radio"
+            },
+            "initialValue": "tip",
+            "name": "type",
+            "type": "string"
+          },
+          {
+            "rows": 3,
+            "name": "text",
+            "type": "text"
+          }
+        ],
+        "type": "object",
+        "name": "callout",
+        "title": "Callout Box"
       }
     ],
     "name": "blockContent",
@@ -1222,5 +1271,319 @@
     "name": "termsPage",
     "type": "document",
     "title": "Algemene Voorwaarden Pagina"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string",
+        "title": "Name"
+      },
+      {
+        "options": {
+          "source": "title"
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "rows": 2,
+        "description": "Short description shown on category pages",
+        "name": "description",
+        "type": "text",
+        "title": "Description (optional)"
+      }
+    ],
+    "name": "blogCategory",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "max",
+                "constraint": 100
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "title",
+          "maxLength": 96
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug",
+        "title": "Slug (URL)"
+      },
+      {
+        "rows": 3,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "max",
+                "constraint": 160
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Short summary shown on cards and used as meta description (max 160 characters)",
+        "name": "excerpt",
+        "type": "text"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "fields": [
+          {
+            "description": "Required for SEO and accessibility",
+            "name": "alt",
+            "type": "string",
+            "title": "Alt text"
+          }
+        ],
+        "name": "mainImage",
+        "type": "image",
+        "title": "Cover Image"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Can't find the right category? Create one under Blog Categories first.",
+        "to": [
+          {
+            "type": "blogCategory"
+          }
+        ],
+        "name": "category",
+        "type": "reference"
+      },
+      {
+        "options": {
+          "layout": "tags"
+        },
+        "description": "e.g. Panini Prizm, Topps Chrome, rookie cards",
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "tags",
+        "type": "array"
+      },
+      {
+        "initialValue": false,
+        "description": "Pin as hero at the top of the blog page",
+        "name": "featured",
+        "type": "boolean",
+        "title": "Featured Post"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "publishedAt",
+        "type": "datetime",
+        "title": "Published at"
+      },
+      {
+        "description": "Leave empty if not updated after first publish",
+        "name": "updatedAt",
+        "type": "datetime",
+        "title": "Last Updated"
+      },
+      {
+        "initialValue": "V-Dub's Cards",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "author",
+        "type": "string",
+        "title": "Author name"
+      },
+      {
+        "initialValue": "Trading Card Expert",
+        "name": "authorRole",
+        "type": "string",
+        "title": "Author role"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "authorImage",
+        "type": "image",
+        "title": "Author photo"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "body",
+        "type": "blockContent"
+      },
+      {
+        "description": "Optional FAQ section shown at the end of the article. Automatically adds FAQ structured data (schema.org) for Google and AI search engines.",
+        "of": [
+          {
+            "fields": [
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "question",
+                "type": "string"
+              },
+              {
+                "rows": 4,
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "answer",
+                "type": "text"
+              }
+            ],
+            "type": "object",
+            "name": "faqItem",
+            "title": "Question & Answer"
+          }
+        ],
+        "name": "faq",
+        "type": "array",
+        "title": "FAQ"
+      },
+      {
+        "description": "Leave empty to use the post title",
+        "name": "seoTitle",
+        "type": "string",
+        "title": "SEO Title (optional override)"
+      },
+      {
+        "rows": 2,
+        "description": "Leave empty to use the excerpt",
+        "name": "seoDescription",
+        "type": "text",
+        "title": "SEO Description (optional override)"
+      }
+    ],
+    "name": "blogPost",
+    "type": "document"
   }
 ]

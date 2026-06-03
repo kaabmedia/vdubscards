@@ -4,6 +4,7 @@ import {
   SITEMAP_PRODUCTS_QUERY,
   SITEMAP_COLLECTIONS_QUERY,
 } from "@/lib/shopify/queries";
+import { getAllBlogSlugs } from "@/lib/sanity/blog";
 
 const BASE_URL = "https://vdubscards.com";
 
@@ -66,13 +67,15 @@ async function getAllCollectionHandles(): Promise<SitemapNode[]> {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [products, collections] = await Promise.all([
+  const [products, collections, blogSlugs] = await Promise.all([
     getAllProductHandles(),
     getAllCollectionHandles(),
+    getAllBlogSlugs(),
   ]);
 
   const staticPages: MetadataRoute.Sitemap = [
     { url: BASE_URL, lastModified: new Date(), changeFrequency: "daily", priority: 1.0 },
+    { url: `${BASE_URL}/blog`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
     { url: `${BASE_URL}/collections`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
     { url: `${BASE_URL}/about`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE_URL}/contact`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
@@ -99,5 +102,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...collectionPages, ...productPages];
+  const blogPages: MetadataRoute.Sitemap = blogSlugs.map((b) => ({
+    url: `${BASE_URL}/blog/${b.slug}`,
+    lastModified: new Date(b.updatedAt ?? b.publishedAt),
+    changeFrequency: "monthly" as const,
+    priority: 0.75,
+  }));
+
+  return [...staticPages, ...collectionPages, ...productPages, ...blogPages];
 }
