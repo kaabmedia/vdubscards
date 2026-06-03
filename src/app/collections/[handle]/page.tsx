@@ -35,11 +35,24 @@ export async function generateMetadata({ params }: Props) {
     const title = data?.collection?.title;
     const description = data?.collection?.description;
     if (!title) return { title: "Collection" };
+    const desc = description
+      ? description.slice(0, 160)
+      : `Shop ${title} singles at V-Dub's Cards. Trading card singles shipped worldwide from the Netherlands.`;
     return {
-      title: `${title} | V-Dub's Cards`,
-      description: description
-        ? description.slice(0, 160)
-        : `View all products in the ${title} collection.`,
+      title,
+      description: desc,
+      alternates: { canonical: `https://vdubscards.com/collections/${handle}` },
+      openGraph: {
+        title: `${title} | V-Dub's Cards`,
+        description: desc,
+        url: `https://vdubscards.com/collections/${handle}`,
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${title} | V-Dub's Cards`,
+        description: desc,
+      },
     };
   } catch {
     return { title: "Collection" };
@@ -92,9 +105,36 @@ export default async function CollectionPage({ params, searchParams }: Props) {
   const pageInfo = collection.products.pageInfo;
   const availableFilters = (collection.products.filters ?? []).filter((f) => f.id !== "filter.v.availability");
   const isSaleCollection = handle.toLowerCase() === "sale";
+  const collectionUrl = `https://vdubscards.com/collections/${handle}`;
+
+  const collectionJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": collectionUrl,
+    name: collection.title,
+    description: collection.description || undefined,
+    url: collectionUrl,
+    ...(collection.image ? { image: collection.image.url } : {}),
+    mainEntity: {
+      "@type": "ItemList",
+      name: collection.title,
+      numberOfItems: totalProductsCount ?? products.length,
+      itemListElement: products.slice(0, 10).map((p, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: p.title,
+        url: `https://vdubscards.com/producten/${p.handle}`,
+      })),
+    },
+  };
 
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionJsonLd) }}
+        suppressHydrationWarning
+      />
       {/* Hero */}
       {collection.image ? (
         <header className="w-full bg-muted">

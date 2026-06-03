@@ -5,6 +5,8 @@ import { getPrivacyPage } from "@/lib/sanity/privacyPage";
 export const metadata: Metadata = {
   title: "Privacy Policy | V-Dub's Cards",
   description: "Privacy policy for V-Dub's Cards. How we collect, use and protect your personal information.",
+  alternates: { canonical: "https://vdubscards.com/privacy" },
+  robots: { index: true, follow: false },
 };
 
 export default async function PrivacyPage() {

@@ -30,11 +30,30 @@ export async function generateMetadata({
     variables: { handle },
   });
 
-  if (!product) return { title: "Product not found" };
+  if (!product) return { title: "Product not found", robots: { index: false } };
+
+  const description = product.description?.slice(0, 160) || `Buy ${product.title} at V-Dub's Cards. Trading card singles shipped worldwide from the Netherlands.`;
+  const imageUrl = product.featuredImage?.url;
 
   return {
-    title: `${product.title} | V-Dub's Cards`,
-    description: product.description?.slice(0, 160) || undefined,
+    title: product.title,
+    description,
+    alternates: { canonical: `https://vdubscards.com/producten/${handle}` },
+    openGraph: {
+      title: `${product.title} | V-Dub's Cards`,
+      description,
+      url: `https://vdubscards.com/producten/${handle}`,
+      type: "website",
+      images: imageUrl
+        ? [{ url: imageUrl, alt: product.title, width: 800, height: 800 }]
+        : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.title,
+      description,
+      images: imageUrl ? [imageUrl] : undefined,
+    },
   };
 }
 
@@ -128,8 +147,100 @@ export default async function ProductPage({
     }
   }
 
+  const productUrl = `https://vdubscards.com/producten/${handle}`;
+  const priceValidUntil = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split("T")[0];
+  const productJsonLd = {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "@id": productUrl,
+    name: product.title,
+    description: product.description || undefined,
+    url: productUrl,
+    image: images.map((img) => ({
+      "@type": "ImageObject",
+      url: img.url,
+      width: img.width || 800,
+      height: img.height || 800,
+    })),
+    sku: product.id,
+    ...(product.productType ? { category: product.productType } : {}),
+    ...(product.tags?.length
+      ? {
+          brand: {
+            "@type": "Brand",
+            name:
+              product.tags.find((t) =>
+                ["topps", "panini", "futera", "upper deck", "donruss"].includes(t.toLowerCase())
+              ) ?? "V-Dub's Cards",
+          },
+        }
+      : {}),
+    offers: {
+      "@type": "Offer",
+      url: productUrl,
+      priceCurrency: product.priceRange.minVariantPrice.currencyCode,
+      price: product.priceRange.minVariantPrice.amount,
+      priceValidUntil,
+      availability: firstVariant?.availableForSale
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      itemCondition: "https://schema.org/UsedCondition",
+      seller: {
+        "@type": "Organization",
+        name: "V-Dub's Cards",
+        url: "https://vdubscards.com",
+      },
+    },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://vdubscards.com",
+      },
+      ...(primaryCollection
+        ? [
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: primaryCollection.title,
+              item: `https://vdubscards.com/collections/${primaryCollection.handle}`,
+            },
+            {
+              "@type": "ListItem",
+              position: 3,
+              name: product.title,
+              item: productUrl,
+            },
+          ]
+        : [
+            {
+              "@type": "ListItem",
+              position: 2,
+              name: product.title,
+              item: productUrl,
+            },
+          ]),
+    ],
+  };
+
   return (
     <div className="bg-gray-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <div className="container mx-auto px-4 py-6 md:py-10">
         {/* Breadcrumb */}
         <nav className="mb-6 flex min-w-0 flex-nowrap items-center gap-1.5 overflow-hidden text-sm text-muted-foreground">

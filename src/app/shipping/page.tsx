@@ -6,7 +6,15 @@ import { getShippingPage } from "@/lib/sanity/shippingPage";
 
 export const metadata: Metadata = {
   title: "Shipping & Delivery | V-Dub's Cards",
-  description: "Shipping information for V-Dub's Cards. Free standard shipping on orders over €125. Ship to Netherlands, EU, and worldwide.",
+  description: "Shipping information for V-Dub's Cards. Free standard shipping on orders over €125. Ships to Netherlands, EU, and worldwide via DHL with tracking.",
+  alternates: { canonical: "https://vdubscards.com/shipping" },
+  openGraph: {
+    title: "Shipping & Delivery | V-Dub's Cards",
+    description: "Free shipping on orders over €125. Ships to Netherlands, EU, and worldwide.",
+    url: "https://vdubscards.com/shipping",
+    type: "website",
+  },
+  twitter: { card: "summary", title: "Shipping & Delivery | V-Dub's Cards", description: "Free shipping over €125. Ships worldwide." },
 };
 
 const REGION_ICONS: Record<string, React.ElementType> = {

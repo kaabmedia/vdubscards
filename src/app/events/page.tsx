@@ -8,7 +8,15 @@ import { NewsletterSection } from "@/components/home/NewsletterSection";
 export const metadata: Metadata = {
   title: "Events | V-Dub's Cards",
   description:
-    "Find V-Dub's Cards at card events, markets and expos across Europe. Come say hi!",
+    "Find V-Dub's Cards at trading card events, markets and expos across Europe. Check our upcoming and past events.",
+  alternates: { canonical: "https://vdubscards.com/events" },
+  openGraph: {
+    title: "Events | V-Dub's Cards",
+    description: "Find V-Dub's Cards at trading card events, markets and expos across Europe.",
+    url: "https://vdubscards.com/events",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image", title: "Events | V-Dub's Cards", description: "Find V-Dub's Cards at card events and expos across Europe." },
 };
 
 export const revalidate = 900; // ISR: hervalideer elke 15 minuten
@@ -16,8 +24,46 @@ export const revalidate = 900; // ISR: hervalideer elke 15 minuten
 export default async function EventsPage() {
   const { upcoming, past } = await getEventsSplit();
 
+  const eventListJsonLd =
+    upcoming.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: "V-Dub's Cards Upcoming Events",
+          itemListElement: upcoming.map((event, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            item: {
+              "@type": "Event",
+              name: event.name,
+              location: {
+                "@type": "Place",
+                name: event.location,
+              },
+              startDate: event.startDate ?? event.date,
+              endDate: event.endDate ?? event.startDate ?? event.date,
+              organizer: {
+                "@type": "Organization",
+                name: "V-Dub's Cards",
+                url: "https://vdubscards.com",
+              },
+              url: event.link ?? "https://vdubscards.com/events",
+              eventStatus: "https://schema.org/EventScheduled",
+              eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+            },
+          })),
+        }
+      : null;
+
   return (
     <div className="bg-gray-50">
+      {eventListJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(eventListJsonLd) }}
+          suppressHydrationWarning
+        />
+      )}
       <div className="container mx-auto px-4 py-12 md:py-16">
         <div className="mb-10">
           <h1 className="text-3xl font-bold text-gray-900 md:text-4xl">

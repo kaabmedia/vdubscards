@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { unstable_cache } from "next/cache";
 import { Inter } from "next/font/google";
 import { Suspense } from "react";
@@ -23,18 +23,80 @@ import { getHomeSettings } from "@/lib/sanity/countdown";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
+  display: "swap",
 });
 
+const SITE_URL = "https://vdubscards.com";
+const SITE_NAME = "V-Dub's Cards";
+const DEFAULT_DESCRIPTION =
+  "One of Europe's largest single-card marketplaces. Buy soccer cards, NBA, NFL, WWE, UFC, F1, baseball, entertainment and graded cards. Based in the Netherlands, shipping worldwide.";
+
 export const metadata: Metadata = {
-  title: "V-Dub's Cards | Premium Cards, Comics & Collectibles",
-  description:
-    "One of Europe's Largest Single-Card Marketplaces. Premium cards, comics & collectibles curated with care.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    template: `%s | ${SITE_NAME}`,
+    default: `${SITE_NAME} | Sports & Trading Card Singles Europe`,
+  },
+  description: DEFAULT_DESCRIPTION,
+  applicationName: SITE_NAME,
+  authors: [{ name: SITE_NAME, url: SITE_URL }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  keywords: [
+    "trading cards", "sports cards", "soccer cards", "football cards", "NBA cards",
+    "WWE cards", "UFC cards", "F1 cards", "graded cards", "PSA cards",
+    "card singles Europe", "trading card shop Netherlands",
+  ],
+  formatDetection: { email: false, address: false, telephone: false },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} | Sports & Trading Card Singles Europe`,
+    description: DEFAULT_DESCRIPTION,
+    images: [
+      {
+        url: "/logo-vdubs.png",
+        width: 512,
+        height: 512,
+        alt: "V-Dub's Cards logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE_NAME} | Sports & Trading Card Singles Europe`,
+    description: DEFAULT_DESCRIPTION,
+    images: ["/logo-vdubs.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: SITE_URL,
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: [{ color: "#ffffff" }],
 };
 
 const MENU_HANDLES = ["main-menu", "main_menu", "header", "navigation"];
 const SHOPIFY_STOREFRONT_URL = process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_API_URL ?? "";
 
-/** Cached menu fetch: tries tokenless first (more nested items), falls back to token-based. Cached 1 hour. */
 const getCachedMenu = unstable_cache(
   async (): Promise<NavLink[]> => {
     let best: NavLink[] = [];
@@ -65,7 +127,6 @@ const getCachedMenu = unstable_cache(
   { revalidate: 3600 }
 );
 
-/** Cached home settings: used for newDrop menu toggle. Cached 30 minutes. */
 const getCachedHomeSettings = unstable_cache(
   async () => getHomeSettings(),
   ["layout-home-settings"],
@@ -80,9 +141,7 @@ function filterOutNewDrop(links: NavLink[]): NavLink[] {
     )
     .map((link) => ({
       ...link,
-      children: link.children
-        ? filterOutNewDrop(link.children)
-        : undefined,
+      children: link.children ? filterOutNewDrop(link.children) : undefined,
     }));
 }
 
@@ -97,9 +156,7 @@ async function getShopId(): Promise<string> {
 
 export default async function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   let menuItems = await getCachedMenu();
   if (menuItems.length === 0) menuItems = getDefaultMenuItems();
 
@@ -110,11 +167,61 @@ export default async function RootLayout({
     menuItems = filterOutNewDrop(menuItems);
   }
 
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${SITE_URL}/#organization`,
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: {
+      "@type": "ImageObject",
+      url: `${SITE_URL}/logo-vdubs.png`,
+      width: 512,
+      height: 512,
+    },
+    email: "Vdubscards@hotmail.com",
+    description: DEFAULT_DESCRIPTION,
+    areaServed: "Worldwide",
+    foundingLocation: { "@type": "Place", name: "Netherlands" },
+    address: { "@type": "PostalAddress", addressCountry: "NL" },
+  };
+
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
+    name: SITE_NAME,
+    url: SITE_URL,
+    publisher: { "@id": `${SITE_URL}/#organization` },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${SITE_URL}/search?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
-    <html lang="nl">
-      <body
-        className={`${inter.variable} font-sans antialiased min-h-screen flex flex-col`}
-      >
+    <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://cdn.shopify.com" />
+        <link rel="preconnect" href="https://cdn.sanity.io" />
+        <link rel="dns-prefetch" href="https://cdn.shopify.com" />
+        <link rel="dns-prefetch" href="https://cdn.sanity.io" />
+      </head>
+      <body className={`${inter.variable} font-sans antialiased min-h-screen flex flex-col`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+          suppressHydrationWarning
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+          suppressHydrationWarning
+        />
         <CartProvider>
           <WishlistProvider>
             <Suspense>

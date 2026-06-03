@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { shopifyFetch } from "@/lib/shopify/client";
 import {
   PRODUCTS_QUERY,
@@ -19,6 +20,26 @@ import { ProductSection } from "@/components/home/ProductSection";
 import { CollectionsSection } from "@/components/home/CollectionsSection";
 import { EventsSection } from "@/components/home/EventsSection";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
+
+export const metadata: Metadata = {
+  title: "Sports & Trading Card Singles Europe | V-Dub's Cards",
+  description:
+    "Buy sports and trading card singles from Europe's largest marketplace. Soccer, NBA, NFL, WWE, UFC, F1, graded cards and more. Based in the Netherlands, shipping worldwide.",
+  alternates: { canonical: "https://vdubscards.com" },
+  openGraph: {
+    title: "Sports & Trading Card Singles Europe | V-Dub's Cards",
+    description:
+      "Buy sports and trading card singles from Europe's largest marketplace. Soccer, NBA, NFL, WWE, UFC, F1, graded cards and more. Based in the Netherlands, shipping worldwide.",
+    url: "https://vdubscards.com",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sports & Trading Card Singles Europe | V-Dub's Cards",
+    description:
+      "Buy sports and trading card singles from Europe's largest marketplace. Soccer, NBA, NFL, WWE, UFC, F1, graded cards and more.",
+  },
+};
 
 // ISR: hervalideer elke 30 minuten
 export const revalidate = 1800;
@@ -53,8 +74,46 @@ export default async function HomePage() {
   const recommendations = getRandomFromPool(pool, 4);
   const onSaleProducts = getSaleFromPool(pool, 4);
 
+  const storeJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Store",
+    name: "V-Dub's Cards",
+    url: "https://vdubscards.com",
+    image: "https://vdubscards.com/logo-vdubs.png",
+    description:
+      "One of Europe's largest single-card marketplaces. Sports and trading card singles, graded cards, boxes and packs. Based in the Netherlands, shipping worldwide.",
+    email: "Vdubscards@hotmail.com",
+    address: {
+      "@type": "PostalAddress",
+      addressCountry: "NL",
+    },
+    areaServed: "Worldwide",
+    currenciesAccepted: "EUR",
+    paymentAccepted: "Credit Card, iDEAL, Bancontact, PayPal, Apple Pay",
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Trading Cards",
+      itemListElement: [
+        { "@type": "OfferCatalog", name: "Soccer Cards" },
+        { "@type": "OfferCatalog", name: "NBA Basketball Cards" },
+        { "@type": "OfferCatalog", name: "NFL American Football Cards" },
+        { "@type": "OfferCatalog", name: "WWE Wrestling Cards" },
+        { "@type": "OfferCatalog", name: "UFC Cards" },
+        { "@type": "OfferCatalog", name: "F1 Racing Cards" },
+        { "@type": "OfferCatalog", name: "Baseball Cards" },
+        { "@type": "OfferCatalog", name: "Entertainment Cards" },
+        { "@type": "OfferCatalog", name: "Graded Cards" },
+        { "@type": "OfferCatalog", name: "Boxes & Packs" },
+      ],
+    },
+  };
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd) }}
+      />
       <div className="overflow-visible bg-white">
         {countdown.enabled && countdown.endDate ? (
           <CountdownHeroSection

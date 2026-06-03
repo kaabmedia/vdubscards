@@ -6,7 +6,15 @@ import { getContactPage } from "@/lib/sanity/contactPage";
 export const metadata: Metadata = {
   title: "Contact us | V-Dub's Cards",
   description:
-    "Contact V-Dub's Cards. Reach out by email for product questions, orders and support.",
+    "Contact V-Dub's Cards. Reach out by email for product questions, orders and support. We respond quickly.",
+  alternates: { canonical: "https://vdubscards.com/contact" },
+  openGraph: {
+    title: "Contact V-Dub's Cards",
+    description: "Contact us for product questions, orders and support. We respond quickly.",
+    url: "https://vdubscards.com/contact",
+    type: "website",
+  },
+  twitter: { card: "summary", title: "Contact V-Dub's Cards", description: "Get in touch for product questions, orders and support." },
 };
 
 export default async function ContactPage() {

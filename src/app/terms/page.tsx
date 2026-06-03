@@ -5,6 +5,8 @@ import { getTermsPage } from "@/lib/sanity/termsPage";
 export const metadata: Metadata = {
   title: "Terms & Conditions | V-Dub's Cards",
   description: "Terms and conditions for V-Dub's Cards. Rules for using our store and services.",
+  alternates: { canonical: "https://vdubscards.com/terms" },
+  robots: { index: true, follow: false },
 };
 
 export default async function TermsPage() {

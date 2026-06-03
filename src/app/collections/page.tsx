@@ -1,8 +1,28 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { shopifyFetch } from "@/lib/shopify/client";
 import { COLLECTIONS_QUERY } from "@/lib/shopify/queries";
 import type { CollectionsResponse, ShopifyCollection } from "@/lib/shopify/types";
+
+export const metadata: Metadata = {
+  title: "All Collections | V-Dub's Cards",
+  description:
+    "Browse all trading card collections at V-Dub's Cards. Soccer, NBA, NFL, WWE, UFC, F1, baseball, entertainment, graded cards, boxes and packs.",
+  alternates: { canonical: "https://vdubscards.com/collections" },
+  openGraph: {
+    title: "All Collections | V-Dub's Cards",
+    description:
+      "Browse all trading card collections. Soccer, NBA, NFL, WWE, UFC, F1, baseball, entertainment, graded cards, boxes and packs.",
+    url: "https://vdubscards.com/collections",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "All Collections | V-Dub's Cards",
+    description: "Browse all trading card collections at V-Dub's Cards.",
+  },
+};
 
 export const revalidate = 3600; // ISR: hervalideer elk uur
 

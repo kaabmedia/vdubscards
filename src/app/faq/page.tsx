@@ -7,13 +7,31 @@ import { getFaqPage } from "@/lib/sanity/faqPage";
 export const metadata: Metadata = {
   title: "FAQ | V-Dub's Cards",
   description: "Frequently asked questions about V-Dub's Cards. Shipping, returns, payments, authenticity and more.",
+  alternates: { canonical: "https://vdubscards.com/faq" },
 };
 
 export default async function FAQPage() {
   const data = await getFaqPage();
 
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: data.items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  };
+
   return (
     <div className="bg-gray-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <div className="container mx-auto px-4 py-12 md:py-16">
         <div className="mb-10">
           <h1 className="text-3xl font-bold text-gray-900 md:text-4xl">{data.pageTitle}</h1>

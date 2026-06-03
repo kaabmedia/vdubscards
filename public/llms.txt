@@ -1,0 +1,75 @@
+# V-Dub's Cards
+> One of Europe's largest single-card marketplaces for sports and trading cards. Based in the Netherlands, shipping worldwide.
+
+## About
+
+V-Dub's Cards is an online trading card shop based in the Netherlands. We specialise in individual (single) sports and trading cards, sealed boxes, lots and graded cards from brands including Topps, Panini, Futera, Upper Deck and more.
+
+**Founded:** Netherlands
+**Language:** English
+**Shipping:** Worldwide including EU, UK, USA
+**Contact:** Vdubscards@hotmail.com
+**Website:** https://vdubscards.com
+
+## What we sell
+
+- Soccer / Football trading cards — singles from Topps Chrome, Panini Select, Panini Prizm, Futera and more. 1000+ singles including Dutch players (Ajax, Feyenoord, PSV, Netherlands), rookies, autographs, numbered cards, parallels and patches.
+- NBA / Basketball cards — Panini Prizm, Panini Obsidian, Topps, autograph cards, rookie cards, numbered parallels.
+- NFL / American Football cards — Panini Mosaic, Panini Select, Panini Prizm, singles and lots.
+- WWE / Wrestling cards — Topps, Panini, legends, rookies, autographs, numbered cards.
+- UFC / MMA cards — Singles and autographs.
+- F1 / Racing cards — Topps Chrome, numbered cards, race-worn relics.
+- Baseball cards — Singles, lots and sealed product.
+- Entertainment cards — Marvel, Star Wars, film and TV.
+- Graded cards — PSA, SGC authenticated cards across all sports.
+- Sealed boxes & packs — Hobby boxes, blaster boxes, value packs.
+- Lots & sets — Mixed lots by player, team, set or sport.
+
+## Key facts for collectors
+
+- Free shipping on EU orders from €125
+- Processing time: 1–2 business days
+- Carrier: DHL with tracking
+- Returns: 14-day return policy for items in original condition
+- Authenticity: all products sourced from trusted distributors, 100% authentic
+- Payment methods: Credit card, iDEAL, Bancontact, PayPal, Apple Pay
+
+## Expertise & E-E-A-T
+
+V-Dub's Cards is a specialist trading card retailer with deep knowledge of the hobby. Our inventory includes rare, numbered, autograph and graded cards from every major sport. We ship internationally from the Netherlands and are a trusted source for European collectors.
+
+## Site structure
+
+- Homepage: https://vdubscards.com
+- All collections: https://vdubscards.com/collections
+- Products (search): https://vdubscards.com/search?q={query}
+- FAQ: https://vdubscards.com/faq
+- About: https://vdubscards.com/about
+- Shipping info: https://vdubscards.com/shipping
+- Returns policy: https://vdubscards.com/returns
+- Contact: https://vdubscards.com/contact
+- Privacy policy: https://vdubscards.com/privacy
+- Terms: https://vdubscards.com/terms
+- Events: https://vdubscards.com/events
+
+## Structured data implemented
+
+- JSON-LD: Product, Offer, BreadcrumbList on every product page
+- JSON-LD: CollectionPage + ItemList on every collection page
+- JSON-LD: Organization + WebSite + SearchAction on every page
+- JSON-LD: Store + OfferCatalog on homepage
+- JSON-LD: FAQPage on /faq
+- JSON-LD: Event + ItemList on /events
+
+## Crawl guidelines
+
+**Allow:** all public pages (/, /collections/*, /producten/*, /about, /contact, /faq, /shipping, /returns, /privacy, /terms, /events, /search)
+**Disallow:** /api/, /cart/, /checkout/, /wishlist/
+
+## Sitemap
+
+https://vdubscards.com/sitemap.xml
+
+## Last updated
+
+2026-06-03

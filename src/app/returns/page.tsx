@@ -5,7 +5,15 @@ import { getReturnsPage } from "@/lib/sanity/returnsPage";
 
 export const metadata: Metadata = {
   title: "Returns & Refunds | V-Dub's Cards",
-  description: "Returns and refunds policy for V-Dub's Cards. Learn how we process refunds, exchanges and gifts.",
+  description: "14-day return policy at V-Dub's Cards. Learn how we process returns, refunds and exchanges for trading cards and collectibles.",
+  alternates: { canonical: "https://vdubscards.com/returns" },
+  openGraph: {
+    title: "Returns & Refunds | V-Dub's Cards",
+    description: "14-day return policy. Learn how we process returns and refunds.",
+    url: "https://vdubscards.com/returns",
+    type: "website",
+  },
+  twitter: { card: "summary", title: "Returns & Refunds | V-Dub's Cards", description: "14-day return policy for trading cards." },
 };
 
 export default async function ReturnsPage() {

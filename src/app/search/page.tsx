@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { shopifyFetch } from "@/lib/shopify/client";
 import { SEARCH_PAGE_QUERY } from "@/lib/shopify/queries";
 import type { SearchPageResponse } from "@/lib/shopify/types";
@@ -5,6 +6,20 @@ import { SearchProductGrid } from "@/components/search/SearchProductGrid";
 import type { ShopifyProduct } from "@/lib/shopify/types";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}): Promise<Metadata> {
+  const sp = await searchParams;
+  const query = (sp.q ?? "").trim();
+  return {
+    title: query ? `Search: "${query}"` : "Search",
+    description: query ? `Search results for "${query}" at V-Dub's Cards.` : "Search our trading card collection.",
+    robots: { index: false, follow: true },
+  };
+}
 
 function parseFiltersParam(raw: string | undefined): Record<string, unknown>[] {
   if (!raw) return [];

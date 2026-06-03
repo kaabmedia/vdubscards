@@ -601,6 +601,40 @@ export const CART_QUERY = `
   }
 `;
 
+export const SITEMAP_PRODUCTS_QUERY = `
+  query SitemapProducts($first: Int = 250, $after: String) {
+    products(first: $first, after: $after) {
+      edges {
+        node {
+          handle
+          updatedAt
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
+export const SITEMAP_COLLECTIONS_QUERY = `
+  query SitemapCollections($first: Int = 100, $after: String) {
+    collections(first: $first, after: $after) {
+      edges {
+        node {
+          handle
+          updatedAt
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
 export const MENU_QUERY = `
   query GetMenu($handle: String!) {
     menu(handle: $handle) {
