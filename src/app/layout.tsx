@@ -175,6 +175,17 @@ export default async function RootLayout({
     menuItems = [...menuItems, { label: "Blog", href: "/blog" }];
   }
 
+  // New Drop always last
+  const newDropItem = menuItems.find(
+    (l) => l.href === "/collections/new-drop" || l.label.toLowerCase().trim() === "new drop"
+  );
+  if (newDropItem) {
+    menuItems = [
+      ...menuItems.filter((l) => l !== newDropItem),
+      newDropItem,
+    ];
+  }
+
   const organizationJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",

@@ -52,6 +52,53 @@
   }
 }
 
+/* ── New Drop nav badge ──────────────────────────────────────────── */
+.new-drop-badge {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 9999px;
+  background: hsl(var(--purple));
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  line-height: 1;
+  vertical-align: middle;
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.new-drop-badge:hover {
+  transform: scale(1.07);
+  filter: brightness(1.15);
+}
+
+.new-drop-badge::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 100%
+  );
+  animation: new-drop-shine 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes new-drop-shine {
+  0%        { left: -120%; }
+  40%, 100% { left: 160%; }
+}
+
 @keyframes mascot-pop {
   0% {
     opacity: 0;

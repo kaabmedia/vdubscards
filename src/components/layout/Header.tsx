@@ -18,6 +18,21 @@ import { useWishlist } from "@/components/wishlist/WishlistProvider";
 import type { NavLink } from "@/lib/shopify/menu";
 import type { ShopifyProduct } from "@/lib/shopify/types";
 
+function isNewDrop(link: NavLink): boolean {
+  return (
+    link.href === "/collections/new-drop" ||
+    link.label.toLowerCase().trim() === "new drop"
+  );
+}
+
+function NewDropBadge({ label }: { label: string }) {
+  return (
+    <span className="new-drop-badge">
+      ✦ {label}
+    </span>
+  );
+}
+
 /* ─────────────────────────── Mobile nav ────────────────────────── */
 
 function MobileNavItem({
@@ -42,7 +57,7 @@ function MobileNavItem({
           style={{ paddingLeft: `${paddingLeft}px`, paddingRight: "8px" }}
           onClick={onNavigate}
         >
-          {link.label}
+          {isNewDrop(link) ? <NewDropBadge label={link.label} /> : link.label}
         </Link>
         {hasChildren && (
           <button
@@ -102,7 +117,7 @@ function DesktopFlyoutItem({ link }: { link: NavLink }) {
         href={link.href}
         className="block whitespace-nowrap px-4 py-1.5 text-sm text-foreground transition-colors hover:bg-muted hover:text-purple"
       >
-        {link.label}
+        {isNewDrop(link) ? <NewDropBadge label={link.label} /> : link.label}
       </Link>
     );
   }
@@ -170,14 +185,25 @@ function DesktopTopNavItem({ link }: { link: NavLink }) {
         href={link.href}
         className="group relative inline-flex items-center gap-1 py-1 text-sm font-medium text-foreground transition-colors hover:text-foreground"
       >
-        {link.label}
-        {hasChildren && (
+        {isNewDrop(link) ? (
+          <NewDropBadge label={link.label} />
+        ) : (
+          <>
+            {link.label}
+            {hasChildren && (
+              <ChevronDown
+                className={`h-3.5 w-3.5 text-purple transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+              />
+            )}
+            {/* Animated underline */}
+            <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 rounded-full bg-purple transition-all duration-300 group-hover:w-full" />
+          </>
+        )}
+        {isNewDrop(link) && hasChildren && (
           <ChevronDown
             className={`h-3.5 w-3.5 text-purple transition-transform duration-200 ${open ? "rotate-180" : ""}`}
           />
         )}
-        {/* Animated underline */}
-        <span className="absolute -bottom-0.5 left-0 h-0.5 w-0 rounded-full bg-purple transition-all duration-300 group-hover:w-full" />
       </Link>
 
       {/* Dropdown */}
