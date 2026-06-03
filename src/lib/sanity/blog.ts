@@ -29,6 +29,7 @@ export interface BlogPost {
   authorRole?: string;
   authorImage?: { asset: { _ref: string } };
   featured?: boolean;
+  bodyCharCount?: number;
   body?: PortableTextBlock[];
   faq?: FaqItem[];
   seoTitle?: string;
@@ -50,7 +51,8 @@ const POST_SUMMARY_FIELDS = `
   updatedAt,
   author,
   authorRole,
-  featured
+  featured,
+  "bodyCharCount": length(pt::text(body))
 `;
 
 const ALL_POSTS_QUERY = `
@@ -178,6 +180,13 @@ export function estimateReadingTime(body: PortableTextBlock[]): number {
     .join(" ");
   const words = text.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.ceil(words / 200));
+}
+
+// Used on overview pages where only char count (from GROQ pt::text) is available.
+// ~5 chars per word, 200 words per minute → ~1000 chars per minute.
+export function estimateReadingTimeFromChars(charCount?: number): number {
+  if (!charCount) return 1;
+  return Math.max(1, Math.ceil(charCount / 1000));
 }
 
 export function formatBlogDate(dateString: string): string {

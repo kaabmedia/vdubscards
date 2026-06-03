@@ -167,6 +167,14 @@ export default async function RootLayout({
     menuItems = filterOutNewDrop(menuItems);
   }
 
+  // Inject Blog link if not already present in the Shopify menu
+  const hasBlog = menuItems.some(
+    (l) => l.href === "/blog" || l.label.toLowerCase() === "blog"
+  );
+  if (!hasBlog) {
+    menuItems = [...menuItems, { label: "Blog", href: "/blog" }];
+  }
+
   const organizationJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",

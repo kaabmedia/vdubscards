@@ -8,6 +8,7 @@ import {
   getRelatedPosts,
   getBlogImageUrl,
   estimateReadingTime,
+  estimateReadingTimeFromChars,
   formatBlogDate,
 } from "@/lib/sanity/blog";
 import type { BlogPostSummary } from "@/lib/sanity/blog";
@@ -59,6 +60,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 function RelatedCard({ post }: { post: BlogPostSummary }) {
   const imageUrl = getBlogImageUrl(post.mainImage, 480, 270);
+  const readMins = estimateReadingTimeFromChars(post.bodyCharCount);
   return (
     <Link
       href={`/blog/${post.slug}`}
@@ -91,7 +93,13 @@ function RelatedCard({ post }: { post: BlogPostSummary }) {
         <p className="mt-1.5 line-clamp-2 flex-1 text-xs leading-relaxed text-gray-500">
           {post.excerpt}
         </p>
-        <p className="mt-3 text-xs text-gray-400">{formatBlogDate(post.publishedAt)}</p>
+        <div className="mt-3 flex items-center justify-between">
+          <p className="text-xs text-gray-400">{formatBlogDate(post.publishedAt)}</p>
+          <span className="flex items-center gap-1 text-xs text-gray-400">
+            <Clock className="h-3 w-3" />
+            {readMins} min
+          </span>
+        </div>
       </div>
     </Link>
   );

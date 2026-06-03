@@ -2,9 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowRight, Clock, Tag } from "lucide-react";
-import { getAllBlogPosts, getFeaturedPost, getBlogImageUrl, estimateReadingTime, formatBlogDate } from "@/lib/sanity/blog";
+import { getAllBlogPosts, getFeaturedPost, getBlogImageUrl, estimateReadingTimeFromChars, formatBlogDate } from "@/lib/sanity/blog";
 import type { BlogPostSummary } from "@/lib/sanity/blog";
-import type { PortableTextBlock } from "@portabletext/react";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
 
 export const metadata: Metadata = {
@@ -37,19 +36,9 @@ function CategoryBadge({ category }: { category: string }) {
   );
 }
 
-function ReadTime({ body }: { body?: PortableTextBlock[] }) {
-  const mins = estimateReadingTime(body ?? []);
-  return (
-    <span className="flex items-center gap-1 text-xs text-gray-500">
-      <Clock className="h-3 w-3" />
-      {mins} min read
-    </span>
-  );
-}
-
 function PostCard({ post }: { post: BlogPostSummary }) {
   const imageUrl = getBlogImageUrl(post.mainImage, 640, 360);
-  const readMins = estimateReadingTime([]);
+  const readMins = estimateReadingTimeFromChars(post.bodyCharCount);
 
   return (
     <Link
@@ -104,7 +93,7 @@ function PostCard({ post }: { post: BlogPostSummary }) {
 
 function FeaturedHero({ post }: { post: BlogPostSummary }) {
   const imageUrl = getBlogImageUrl(post.mainImage, 1400, 700);
-  const readMins = estimateReadingTime([]);
+  const readMins = estimateReadingTimeFromChars(post.bodyCharCount);
 
   return (
     <Link href={`/blog/${post.slug}`} className="group block">

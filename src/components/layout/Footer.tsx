@@ -6,6 +6,7 @@ const shopLinks = [
   { href: "/collections/all", label: "All Products" },
   { href: "/collections", label: "Collections" },
   { href: "/collections/sale", label: "On Sale" },
+  { href: "/blog", label: "Blog" },
 ];
 
 const customerLinks = [
