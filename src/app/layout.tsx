@@ -28,6 +28,12 @@ const inter = Inter({
 
 const SITE_URL = "https://vdubscards.com";
 const SITE_NAME = "V-Dub's Cards";
+
+// Google Tag Manager — container ID is public (visible in page source).
+// GA4 (G-CMB8VQPCR3) wordt binnen GTM gekoppeld, niet hier in code.
+const GTM_ID = "GTM-P6QH6S7V";
+// Alleen laden in productie zodat lokale dev-bezoeken je analytics niet vervuilen.
+const GTM_ENABLED = process.env.NODE_ENV === "production";
 const DEFAULT_DESCRIPTION =
   "One of Europe's largest single-card marketplaces. Buy soccer cards, NBA, NFL, WWE, UFC, F1, baseball, entertainment and graded cards. Based in the Netherlands, shipping worldwide.";
 
@@ -225,12 +231,31 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
+        {GTM_ENABLED && (
+          <script
+            id="gtm-init"
+            dangerouslySetInnerHTML={{
+              __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_ID}');`,
+            }}
+          />
+        )}
         <link rel="preconnect" href="https://cdn.shopify.com" />
         <link rel="preconnect" href="https://cdn.sanity.io" />
         <link rel="dns-prefetch" href="https://cdn.shopify.com" />
         <link rel="dns-prefetch" href="https://cdn.sanity.io" />
       </head>
       <body className={`${inter.variable} font-sans antialiased min-h-screen flex flex-col`}>
+        {GTM_ENABLED && (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+              height="0"
+              width="0"
+              style={{ display: "none", visibility: "hidden" }}
+              title="Google Tag Manager"
+            />
+          </noscript>
+        )}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}

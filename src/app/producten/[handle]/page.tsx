@@ -13,6 +13,7 @@ import type {
   ShopifyProduct,
 } from "@/lib/shopify/types";
 import { AddToCartButton } from "@/components/shop/AddToCartButton";
+import { TrackViewItem } from "@/components/analytics/TrackViewItem";
 import { ProductImageGallery } from "@/components/shop/ProductImageGallery";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
@@ -233,6 +234,12 @@ export default async function ProductPage({
 
   return (
     <div className="bg-gray-50">
+      <TrackViewItem
+        item_id={firstVariant?.id ?? product.id}
+        item_name={product.title}
+        price={price}
+        item_category={primaryCollection?.title}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
@@ -336,6 +343,9 @@ export default async function ProductPage({
                   variantId={firstVariant.id}
                   available={firstVariant.availableForSale}
                   quantityAvailable={firstVariant.quantityAvailable}
+                  productName={product.title}
+                  price={price}
+                  category={primaryCollection?.title}
                 />
               )}
             </div>

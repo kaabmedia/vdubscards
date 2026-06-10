@@ -3,18 +3,26 @@
 import { useState } from "react";
 import { useCart } from "@/components/cart/CartProvider";
 import { Button } from "@/components/ui/button";
+import { trackAddToCart } from "@/lib/analytics/gtm";
 import { ShoppingBag, Trash2 } from "lucide-react";
 
 interface AddToCartButtonProps {
   variantId: string;
   available: boolean;
   quantityAvailable?: number | null;
+  // Optional product info for the GA4 `add_to_cart` event.
+  productName?: string;
+  price?: number;
+  category?: string;
 }
 
 export function AddToCartButton({
   variantId,
   available,
   quantityAvailable,
+  productName,
+  price,
+  category,
 }: AddToCartButtonProps) {
   const { addLine, removeLine, lines } = useCart();
   const [added, setAdded] = useState(false);
@@ -27,6 +35,15 @@ export function AddToCartButton({
 
   const handleAdd = () => {
     addLine(variantId, 1, quantityAvailable ?? undefined);
+    if (productName != null && price != null) {
+      trackAddToCart({
+        item_id: variantId,
+        item_name: productName,
+        price,
+        quantity: 1,
+        item_category: category,
+      });
+    }
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };

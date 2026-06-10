@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/components/cart/CartProvider";
+import { trackBeginCheckout } from "@/lib/analytics/gtm";
 import {
   Loader2,
   Minus,
@@ -460,6 +461,16 @@ export default function CartPage() {
             {displayCheckoutUrl ? (
               <a
                 href={displayCheckoutUrl}
+                onClick={() =>
+                  trackBeginCheckout(
+                    cartLines.map((line) => ({
+                      item_id: line.merchandise.id,
+                      item_name: line.merchandise.product.title,
+                      price: parseFloat(line.merchandise.price.amount),
+                      quantity: line.quantity,
+                    }))
+                  )
+                }
                 className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-foreground py-3 text-sm font-semibold text-background transition-colors hover:bg-foreground/90"
               >
                 Checkout
