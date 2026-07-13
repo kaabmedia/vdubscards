@@ -37,6 +37,9 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
     ],
     formats: ["image/avif", "image/webp"],
+    // Shopify/Sanity image URLs are content-hashed, so a replaced photo gets a new
+    // URL — caching optimized variants for 31 days is safe and avoids re-optimizing.
+    minimumCacheTTL: 2678400,
   },
 
   async headers() {
@@ -94,6 +97,9 @@ const nextConfig: NextConfig = {
       { source: "/pages/terms-conditions", destination: "/terms", permanent: true },
       { source: "/pages/terms-of-service", destination: "/terms", permanent: true },
       { source: "/sale", destination: "/collections/sale", permanent: true },
+      // Known collection handle mismatches (nav label plural vs. Shopify handle singular).
+      // The collection page also has a dynamic singular/plural fallback for anything not listed here.
+      { source: "/collections/soccer-cards", destination: "/collections/soccer-card", permanent: true },
       { source: "/collections/all", destination: "/collections", permanent: true },
       { source: "/products/:handle", destination: "/producten/:handle", permanent: true },
     ];

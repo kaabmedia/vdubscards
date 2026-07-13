@@ -7,6 +7,7 @@ import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CartProvider } from "@/components/cart/CartProvider";
+import { CartDrawer } from "@/components/cart/CartDrawer";
 import { WishlistProvider } from "@/components/wishlist/WishlistProvider";
 import { ShopifyAnalytics } from "@/components/analytics/ShopifyAnalytics";
 import { shopifyFetch } from "@/lib/shopify/client";
@@ -35,7 +36,7 @@ const GTM_ID = "GTM-P6QH6S7V";
 // Alleen laden in productie zodat lokale dev-bezoeken je analytics niet vervuilen.
 const GTM_ENABLED = process.env.NODE_ENV === "production";
 const DEFAULT_DESCRIPTION =
-  "One of Europe's largest single-card marketplaces. Buy soccer cards, NBA, NFL, WWE, UFC, F1, baseball, entertainment and graded cards. Based in the Netherlands, shipping worldwide.";
+  "One of Europe's largest single-card marketplaces. Buy soccer cards, NBA, NFL, WWE, UFC, F1, baseball, entertainment and graded cards. Based in the Netherlands, shipping across the EU.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -206,7 +207,7 @@ export default async function RootLayout({
     },
     email: "Vdubscards@hotmail.com",
     description: DEFAULT_DESCRIPTION,
-    areaServed: "Worldwide",
+    areaServed: { "@type": "Place", name: "European Union" },
     foundingLocation: { "@type": "Place", name: "Netherlands" },
     address: { "@type": "PostalAddress", addressCountry: "NL" },
   };
@@ -275,6 +276,7 @@ export default async function RootLayout({
             <Header menuItems={menuItems} />
             <main className="flex-1">{children}</main>
             <Footer />
+            <CartDrawer />
           </WishlistProvider>
         </CartProvider>
       </body>

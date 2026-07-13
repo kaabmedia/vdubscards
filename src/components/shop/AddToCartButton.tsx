@@ -24,7 +24,7 @@ export function AddToCartButton({
   price,
   category,
 }: AddToCartButtonProps) {
-  const { addLine, removeLine, lines } = useCart();
+  const { addLine, removeLine, lines, openCart } = useCart();
   const [added, setAdded] = useState(false);
 
   const inCart = lines.find((l) => l.variantId === variantId)?.quantity ?? 0;
@@ -45,6 +45,7 @@ export function AddToCartButton({
       });
     }
     setAdded(true);
+    openCart();
     setTimeout(() => setAdded(false), 2000);
   };
 

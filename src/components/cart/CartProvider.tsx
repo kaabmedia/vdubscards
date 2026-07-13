@@ -27,6 +27,9 @@ interface CartContextValue {
   itemCount: number;
   clearCart: () => void;
   syncCartToShopify: () => Promise<void>;
+  isCartOpen: boolean;
+  openCart: () => void;
+  closeCart: () => void;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -46,6 +49,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
   const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
   const [cartId, setCartId] = useState<string | null>(null);
+  const [isCartOpen, setCartOpen] = useState(false);
+
+  const openCart = useCallback(() => setCartOpen(true), []);
+  const closeCart = useCallback(() => setCartOpen(false), []);
 
   useEffect(() => {
     setCartId(getStoredCartId());
@@ -219,6 +226,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       itemCount,
       clearCart,
       syncCartToShopify,
+      isCartOpen,
+      openCart,
+      closeCart,
     }),
     [
       lines,
@@ -230,6 +240,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       itemCount,
       clearCart,
       syncCartToShopify,
+      isCartOpen,
+      openCart,
+      closeCart,
     ]
   );
 

@@ -20,12 +20,13 @@ export function NewsletterSection() {
         body: JSON.stringify({ email }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Subscription failed");
+      if (!res.ok || !data?.success) throw new Error("failed");
       fireConfetti();
       setSubmitted(true);
       setEmail("");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+    } catch {
+      // Always show a clean, friendly message — never a raw API/IP error.
+      setError("Something went wrong. Please try again.");
     }
   };
 

@@ -346,7 +346,7 @@ export default async function BlogPostPage({ params }: Props) {
                 <p className="text-sm text-gray-500">{post.authorRole}</p>
               )}
               <p className="mt-1.5 text-sm leading-relaxed text-gray-600">
-                Passionate about trading cards and collectibles. Based in the Netherlands, shipping worldwide.
+                Passionate about trading cards and collectibles. Based in the Netherlands, shipping across the EU.
               </p>
             </div>
           </div>

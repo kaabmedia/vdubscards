@@ -13,12 +13,12 @@ import { urlFor } from "@/lib/sanity/image";
 export const metadata: Metadata = {
   title: "About us | V-Dub's Cards",
   description:
-    "V-Dub's Cards is a family business based in the Netherlands built on passion for sports cards and collectibles. Authentic products, personal service, worldwide shipping.",
+    "V-Dub's Cards is a family business based in the Netherlands built on passion for sports cards and collectibles. Authentic products, personal service, EU-wide shipping.",
   alternates: { canonical: "https://vdubscards.com/about" },
   openGraph: {
     title: "About V-Dub's Cards | Trading Card Shop Netherlands",
     description:
-      "V-Dub's Cards is a family business based in the Netherlands built on passion for sports cards and collectibles. Authentic products, personal service, worldwide shipping.",
+      "V-Dub's Cards is a family business based in the Netherlands built on passion for sports cards and collectibles. Authentic products, personal service, EU-wide shipping.",
     url: "https://vdubscards.com/about",
     type: "website",
   },

@@ -237,7 +237,7 @@ interface HeaderProps {
 
 export function Header({ menuItems = [] }: HeaderProps) {
   const router = useRouter();
-  const { itemCount } = useCart();
+  const { itemCount, openCart } = useCart();
   const { count: wishlistCount } = useWishlist();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -417,8 +417,10 @@ export function Header({ menuItems = [] }: HeaderProps) {
           </Link>
 
           {/* Cart */}
-          <Link
-            href="/cart"
+          <button
+            type="button"
+            onClick={openCart}
+            aria-label="Open cart"
             className="relative rounded-full p-2 text-foreground transition-all duration-200 hover:scale-110 hover:bg-muted hover:text-purple active:scale-95"
           >
             <ShoppingBag className="h-5 w-5" />
@@ -431,7 +433,7 @@ export function Header({ menuItems = [] }: HeaderProps) {
                 {itemCount}
               </span>
             )}
-          </Link>
+          </button>
         </div>
       </div>
 

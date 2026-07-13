@@ -9,7 +9,7 @@ import { NewsletterSection } from "@/components/home/NewsletterSection";
 export const metadata: Metadata = {
   title: "Blog | V-Dub's Cards",
   description:
-    "Trading card collecting tips, market news, product reviews and guides from V-Dub's Cards. Based in the Netherlands, shipping worldwide.",
+    "Trading card collecting tips, market news, product reviews and guides from V-Dub's Cards. Based in the Netherlands, shipping across the EU.",
   alternates: { canonical: "https://vdubscards.com/blog" },
   openGraph: {
     title: "Blog | V-Dub's Cards",

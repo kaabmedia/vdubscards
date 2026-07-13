@@ -6,21 +6,20 @@ import { getShippingPage } from "@/lib/sanity/shippingPage";
 
 export const metadata: Metadata = {
   title: "Shipping & Delivery | V-Dub's Cards",
-  description: "Shipping information for V-Dub's Cards. Free standard shipping on orders over €125. Ships to Netherlands, EU, and worldwide via DHL with tracking.",
+  description: "Shipping information for V-Dub's Cards. Free standard shipping on orders over €125. Ships across the Netherlands and EU via DHL with tracking.",
   alternates: { canonical: "https://vdubscards.com/shipping" },
   openGraph: {
     title: "Shipping & Delivery | V-Dub's Cards",
-    description: "Free shipping on orders over €125. Ships to Netherlands, EU, and worldwide.",
+    description: "Free shipping on orders over €125. Ships across the Netherlands and EU.",
     url: "https://vdubscards.com/shipping",
     type: "website",
   },
-  twitter: { card: "summary", title: "Shipping & Delivery | V-Dub's Cards", description: "Free shipping over €125. Ships worldwide." },
+  twitter: { card: "summary", title: "Shipping & Delivery | V-Dub's Cards", description: "Free shipping over €125. Ships across the EU." },
 };
 
 const REGION_ICONS: Record<string, React.ElementType> = {
   Netherlands: MapPin,
   "Within EU": Globe,
-  International: Globe,
 };
 
 const INFO_ICONS: Record<string, React.ElementType> = {

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { shopifyFetch } from "@/lib/shopify/client";
 import { getCollectionProductCount } from "@/lib/shopify/collection";
 import { COLLECTION_PAGE_QUERY } from "@/lib/shopify/queries";
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: Props) {
     if (!title) return { title: "Collection" };
     const desc = description
       ? description.slice(0, 160)
-      : `Shop ${title} singles at V-Dub's Cards. Trading card singles shipped worldwide from the Netherlands.`;
+      : `Shop ${title} singles at V-Dub's Cards. Trading card singles shipped across the EU from the Netherlands.`;
     return {
       title,
       description: desc,
@@ -57,6 +57,37 @@ export async function generateMetadata({ params }: Props) {
   } catch {
     return { title: "Collection" };
   }
+}
+
+/**
+ * Generate likely alternate handles for a 404'd collection so we can 301-redirect
+ * instead of showing a dead page. Handles the common singular/plural mismatch
+ * (e.g. "soccer-cards" ↔ "soccer-card") that breaks nav links.
+ */
+function alternateHandles(handle: string): string[] {
+  const candidates = new Set<string>();
+  if (handle.endsWith("-cards")) candidates.add(handle.slice(0, -1)); // -cards → -card
+  else if (handle.endsWith("-card")) candidates.add(`${handle}s`); // -card → -cards
+  if (handle.endsWith("s")) candidates.add(handle.slice(0, -1)); // strip trailing s
+  else candidates.add(`${handle}s`); // add trailing s
+  candidates.delete(handle);
+  return [...candidates];
+}
+
+/** Returns the first alternate handle that resolves to a real collection, or null. */
+async function findExistingAlternate(handle: string): Promise<string | null> {
+  for (const alt of alternateHandles(handle)) {
+    try {
+      const data = await shopifyFetch<CollectionPageResponse>({
+        query: COLLECTION_PAGE_QUERY,
+        variables: { handle: alt, first: 1 },
+      });
+      if (data?.collection) return alt;
+    } catch {
+      // ignore and try the next candidate
+    }
+  }
+  return null;
 }
 
 function parseFiltersParam(raw: string | undefined): Record<string, unknown>[] {
@@ -99,7 +130,12 @@ export default async function CollectionPage({ params, searchParams }: Props) {
   ]);
 
   const collection = data?.collection ?? null;
-  if (!collection) notFound();
+  if (!collection) {
+    // Try a singular/plural variant before giving up (301 to the correct URL).
+    const alt = await findExistingAlternate(handle);
+    if (alt) permanentRedirect(`/collections/${alt}`);
+    notFound();
+  }
 
   const products = collection.products.edges.map((e) => e.node);
   const pageInfo = collection.products.pageInfo;

@@ -24,12 +24,12 @@ import { NewsletterSection } from "@/components/home/NewsletterSection";
 export const metadata: Metadata = {
   title: "Sports & Trading Card Singles Europe | V-Dub's Cards",
   description:
-    "Buy sports and trading card singles from Europe's largest marketplace. Soccer, NBA, NFL, WWE, UFC, F1, graded cards and more. Based in the Netherlands, shipping worldwide.",
+    "Buy sports and trading card singles from Europe's largest marketplace. Soccer, NBA, NFL, WWE, UFC, F1, graded cards and more. Based in the Netherlands, shipping across the EU.",
   alternates: { canonical: "https://vdubscards.com" },
   openGraph: {
     title: "Sports & Trading Card Singles Europe | V-Dub's Cards",
     description:
-      "Buy sports and trading card singles from Europe's largest marketplace. Soccer, NBA, NFL, WWE, UFC, F1, graded cards and more. Based in the Netherlands, shipping worldwide.",
+      "Buy sports and trading card singles from Europe's largest marketplace. Soccer, NBA, NFL, WWE, UFC, F1, graded cards and more. Based in the Netherlands, shipping across the EU.",
     url: "https://vdubscards.com",
     type: "website",
   },
@@ -81,13 +81,13 @@ export default async function HomePage() {
     url: "https://vdubscards.com",
     image: "https://vdubscards.com/logo-vdubs.png",
     description:
-      "One of Europe's largest single-card marketplaces. Sports and trading card singles, graded cards, boxes and packs. Based in the Netherlands, shipping worldwide.",
+      "One of Europe's largest single-card marketplaces. Sports and trading card singles, graded cards, boxes and packs. Based in the Netherlands, shipping across the EU.",
     email: "Vdubscards@hotmail.com",
     address: {
       "@type": "PostalAddress",
       addressCountry: "NL",
     },
-    areaServed: "Worldwide",
+    areaServed: { "@type": "Place", name: "European Union" },
     currenciesAccepted: "EUR",
     paymentAccepted: "Credit Card, iDEAL, Bancontact, PayPal, Apple Pay",
     hasOfferCatalog: {

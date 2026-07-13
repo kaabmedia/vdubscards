@@ -13,6 +13,7 @@ import type {
   ShopifyProduct,
 } from "@/lib/shopify/types";
 import { AddToCartButton } from "@/components/shop/AddToCartButton";
+import { ProductStickyBar } from "@/components/shop/ProductStickyBar";
 import { TrackViewItem } from "@/components/analytics/TrackViewItem";
 import { ProductImageGallery } from "@/components/shop/ProductImageGallery";
 import { ProductCard } from "@/components/shop/ProductCard";
@@ -33,7 +34,7 @@ export async function generateMetadata({
 
   if (!product) return { title: "Product not found", robots: { index: false } };
 
-  const description = product.description?.slice(0, 160) || `Buy ${product.title} at V-Dub's Cards. Trading card singles shipped worldwide from the Netherlands.`;
+  const description = product.description?.slice(0, 160) || `Buy ${product.title} at V-Dub's Cards. Trading card singles shipped across the EU from the Netherlands.`;
   const imageUrl = product.featuredImage?.url;
 
   return {
@@ -337,7 +338,7 @@ export default async function ProductPage({
             )}
 
             {/* Add to Cart */}
-            <div className="mt-6">
+            <div className="mt-6" id="inline-add-to-cart">
               {firstVariant && (
                 <AddToCartButton
                   variantId={firstVariant.id}
@@ -445,6 +446,19 @@ export default async function ProductPage({
         )}
       </div>
       <NewsletterSection />
+
+      {/* Mobile sticky Add to bag — keeps the CTA reachable above the fold */}
+      {firstVariant && (
+        <ProductStickyBar
+          variantId={firstVariant.id}
+          available={firstVariant.availableForSale}
+          quantityAvailable={firstVariant.quantityAvailable}
+          productName={product.title}
+          price={price}
+          category={primaryCollection?.title}
+          compareAtPrice={compareAtPrice}
+        />
+      )}
     </div>
   );
 }

@@ -2,6 +2,29 @@ import { NextRequest, NextResponse } from "next/server";
 
 const BREVO_API_URL = "https://api.brevo.com/v3";
 
+// Generic message shown to the user. We NEVER forward Brevo's raw error
+// text (which can leak server IP addresses and internal details) to the browser.
+const GENERIC_ERROR = "Something went wrong. Please try again.";
+
+/**
+ * Detects Brevo's "unrecognised IP address" security block. When it happens the
+ * server IP must be whitelisted in Brevo → Security → Authorized IPs (or IP
+ * restriction disabled). We log a clear hint but keep the user-facing message generic.
+ */
+function isIpAuthError(err: unknown): boolean {
+  const msg = (err && typeof err === "object" && "message" in err
+    ? String((err as { message?: unknown }).message)
+    : String(err)
+  ).toLowerCase();
+  return (
+    msg.includes("unrecognised ip") ||
+    msg.includes("unrecognized ip") ||
+    msg.includes("ip address") ||
+    msg.includes("authorised_ips") ||
+    msg.includes("authorized_ips")
+  );
+}
+
 export async function POST(request: NextRequest) {
   try {
     const apiKey = process.env.BREVO_API_KEY;
@@ -67,17 +90,27 @@ export async function POST(request: NextRequest) {
       }
       const addErr = await addRes.json().catch(() => ({}));
       console.error("[api/newsletter] Brevo add-to-list:", addRes.status, addErr);
-      const msg = addErr?.message || errData?.message || "Subscription failed";
-      return NextResponse.json({ error: msg }, { status: 500 });
+      if (isIpAuthError(addErr)) {
+        console.error(
+          "[api/newsletter] Brevo blocked the server IP. Whitelist it in Brevo → Security → Authorized IPs, or disable IP restriction."
+        );
+      }
+      // Never forward Brevo's raw message (can leak IP addresses) to the client.
+      return NextResponse.json({ error: GENERIC_ERROR }, { status: 502 });
     }
 
     console.error("[api/newsletter] Brevo error:", createRes.status, errData);
-    const msg = errData?.message || "Subscription failed";
-    return NextResponse.json({ error: msg }, { status: 500 });
+    if (isIpAuthError(errData)) {
+      console.error(
+        "[api/newsletter] Brevo blocked the server IP. Whitelist it in Brevo → Security → Authorized IPs, or disable IP restriction."
+      );
+    }
+    // Never forward Brevo's raw message (can leak IP addresses) to the client.
+    return NextResponse.json({ error: GENERIC_ERROR }, { status: 502 });
   } catch (error) {
     console.error("[api/newsletter]", error);
     return NextResponse.json(
-      { error: "Subscription failed" },
+      { error: GENERIC_ERROR },
       { status: 500 }
     );
   }
