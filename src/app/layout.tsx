@@ -8,6 +8,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { CartDrawer } from "@/components/cart/CartDrawer";
+import { RegionNoticeModal } from "@/components/layout/RegionNoticeModal";
 import { WishlistProvider } from "@/components/wishlist/WishlistProvider";
 import { ShopifyAnalytics } from "@/components/analytics/ShopifyAnalytics";
 import { shopifyFetch } from "@/lib/shopify/client";
@@ -281,6 +282,7 @@ export default async function RootLayout({
             <main className="flex-1">{children}</main>
             <Footer />
             <CartDrawer />
+            <RegionNoticeModal />
           </WishlistProvider>
         </CartProvider>
       </body>
