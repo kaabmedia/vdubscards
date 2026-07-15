@@ -87,7 +87,7 @@ export function CountdownHeroSection({
     backgroundMobile || backgroundTablet || backgroundDesktop;
 
   return (
-    <section className="relative min-h-[400px] overflow-hidden bg-gray-900 md:min-h-[480px]">
+    <section className="relative overflow-hidden bg-gray-900 md:min-h-[480px]">
       {/* Responsive background images (fallback: desktop -> tablet -> mobile) */}
       {(backgroundMobile || backgroundTablet || backgroundDesktop) && (
         <>
@@ -121,7 +121,7 @@ export function CountdownHeroSection({
         <div className="absolute inset-0 bg-gray-900/70" />
       )}
 
-      <div className="container relative mx-auto flex min-h-[400px] flex-col items-center px-4 py-16 md:min-h-[480px] md:flex-row md:flex-nowrap md:items-center md:justify-between md:gap-12 md:py-20">
+      <div className="container relative mx-auto flex flex-col items-center px-4 py-10 md:min-h-[480px] md:flex-row md:flex-nowrap md:items-center md:justify-between md:gap-12 md:py-20">
         {/* Left: headline + form */}
         <div className="z-10 flex flex-1 flex-col md:max-w-md">
           <h1 className="text-3xl font-bold leading-tight text-white md:text-4xl">
@@ -173,7 +173,7 @@ export function CountdownHeroSection({
         </div>
 
         {/* Right: countdown */}
-        <div className="z-10 mt-12 flex flex-wrap justify-center gap-6 md:mt-0 md:gap-10">
+        <div className="z-10 mt-8 flex flex-wrap justify-center gap-6 md:mt-0 md:gap-10">
           {timeLeft?.done ? (
             <p className="text-xl font-semibold text-white">Drop is live!</p>
           ) : timeLeft ? (

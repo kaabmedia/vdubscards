@@ -5,18 +5,18 @@ import { ArrowRight, Package, ShieldCheck, Truck, Tag } from "lucide-react";
 import { shopifyFetch } from "@/lib/shopify/client";
 import {
   PRODUCT_BY_HANDLE_QUERY,
-  PRODUCTS_BY_COLLECTION_QUERY,
+  COLLECTION_PAGE_QUERY,
 } from "@/lib/shopify/queries";
 import type {
   ProductByHandleResponse,
-  CollectionWithProductsResponse,
+  CollectionPageResponse,
   ShopifyProduct,
 } from "@/lib/shopify/types";
 import { AddToCartButton } from "@/components/shop/AddToCartButton";
 import { ProductStickyBar } from "@/components/shop/ProductStickyBar";
 import { TrackViewItem } from "@/components/analytics/TrackViewItem";
 import { ProductImageGallery } from "@/components/shop/ProductImageGallery";
-import { ProductCard } from "@/components/shop/ProductCard";
+import { InfiniteRelatedProducts } from "@/components/shop/InfiniteRelatedProducts";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
 
 export const revalidate = 600; // ISR: hervalideer elke 10 minuten (voorraad kan wijzigen)
@@ -107,42 +107,30 @@ export default async function ProductPage({
         !c.handle.startsWith("hidden-")
     ) ?? collections[0];
 
-  // Fetch related products from same collection, ranked by title similarity
-  let relatedProducts: ShopifyProduct[] = [];
+  // First page of the primary collection for the infinite "More from …" grid.
+  // Uses the same defaults as /api/collections/[handle]/products (CREATED desc,
+  // available only) so the server page and client-loaded pages share one cursor chain.
+  let relatedInitial: ShopifyProduct[] = [];
+  let relatedCursor: string | null = null;
+  let relatedHasNext = false;
   if (primaryCollection) {
     try {
-      const { collection } =
-        await shopifyFetch<CollectionWithProductsResponse>({
-          query: PRODUCTS_BY_COLLECTION_QUERY,
-          variables: { handle: primaryCollection.handle, first: 250 },
-        });
-      if (collection?.products?.edges) {
-        const STOP_WORDS = new Set([
-          "the", "a", "an", "of", "in", "on", "at", "to", "for", "and", "or",
-          "is", "it", "by", "with", "from", "-", "–", "/", "|", "card", "cards",
-          "kaart", "kaarten", "psa", "cgc",
-        ]);
-        const titleWords = product.title
-          .toLowerCase()
-          .split(/[\s\-–/|,()]+/)
-          .filter((w) => w.length > 1 && !STOP_WORDS.has(w));
-
-        const candidates = collection.products.edges
+      const { collection } = await shopifyFetch<CollectionPageResponse>({
+        query: COLLECTION_PAGE_QUERY,
+        variables: {
+          handle: primaryCollection.handle,
+          first: 24,
+          sortKey: "CREATED",
+          reverse: true,
+          filters: [{ available: true }],
+        },
+      });
+      if (collection?.products) {
+        relatedInitial = collection.products.edges
           .map((e) => e.node)
-          .filter((p) => p.id !== product.id && p.variants?.edges?.[0]?.node?.availableForSale !== false);
-
-        // Score each candidate by how many title words match
-        const scored = candidates.map((p) => {
-          const pTitle = p.title.toLowerCase();
-          const score = titleWords.reduce(
-            (s, word) => s + (pTitle.includes(word) ? 1 : 0),
-            0,
-          );
-          return { product: p, score };
-        });
-
-        scored.sort((a, b) => b.score - a.score);
-        relatedProducts = scored.slice(0, 4).map((s) => s.product);
+          .filter((p) => p.id !== product.id);
+        relatedCursor = collection.products.pageInfo.endCursor;
+        relatedHasNext = collection.products.pageInfo.hasNextPage;
       }
     } catch {
       // Silently fail — related products are optional
@@ -410,8 +398,8 @@ export default async function ProductPage({
           </div>
         </div>
 
-        {/* Related products */}
-        {relatedProducts.length > 0 && primaryCollection && (
+        {/* Related products — infinite scroll through the collection, 2 across on mobile */}
+        {relatedInitial.length > 0 && primaryCollection && (
           <section className="mt-16 border-t border-border pt-10">
             <div className="mb-6 flex items-end justify-between">
               <div>
@@ -428,20 +416,13 @@ export default async function ProductPage({
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-              {relatedProducts.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
-            <div className="mt-4 sm:hidden">
-              <Link
-                href={`/collections/${primaryCollection.handle}`}
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground"
-              >
-                View all
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
+            <InfiniteRelatedProducts
+              handle={primaryCollection.handle}
+              initialProducts={relatedInitial}
+              initialEndCursor={relatedCursor}
+              initialHasNextPage={relatedHasNext}
+              excludeId={product.id}
+            />
           </section>
         )}
       </div>

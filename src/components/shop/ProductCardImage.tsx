@@ -5,12 +5,15 @@ interface ProductCardImageProps {
   product: ShopifyProduct;
   sizes?: string;
   className?: string;
+  /** Set for above-the-fold cards (e.g. first items of the mobile strip) to improve LCP. */
+  priority?: boolean;
 }
 
 export function ProductCardImage({
   product,
   sizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw",
   className = "",
+  priority = false,
 }: ProductCardImageProps) {
   const firstImage = product.featuredImage;
   const secondImage = product.images?.edges?.[1]?.node ?? null;
@@ -33,6 +36,7 @@ export function ProductCardImage({
         src={firstImage.url}
         alt={firstImage.altText ?? product.title}
         fill
+        priority={priority}
         className="object-cover transition-opacity duration-300 group-hover:opacity-0"
         sizes={sizes}
       />

@@ -175,4 +175,12 @@
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     background-color: hsl(var(--muted-foreground) / 0.4);
   }
+
+  /* Skip rendering work for off-screen homepage sections → faster FCP/paint.
+     contain-intrinsic-size reserves an estimated height so the scrollbar and
+     layout stay stable (no CLS) before a section is painted. */
+  .cv-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 600px;
+  }
 }

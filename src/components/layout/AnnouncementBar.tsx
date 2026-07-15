@@ -36,15 +36,15 @@ export function AnnouncementBar() {
       </div>
 
       {/* Mobile: vertical ticker, 1 visible at a time */}
-      <div className="relative h-8 overflow-hidden sm:hidden">
+      <div className="relative h-7 overflow-hidden sm:hidden">
         <div
           className="transition-transform duration-500 ease-in-out"
-          style={{ transform: `translateY(-${current * 2}rem)` }}
+          style={{ transform: `translateY(-${current * 1.75}rem)` }}
         >
           {announcements.map((item) => (
             <div
               key={item.text}
-              className="flex h-8 items-center justify-center gap-1.5 text-xs font-medium"
+              className="flex h-7 items-center justify-center gap-1.5 text-xs font-medium"
             >
               <item.icon className="h-3.5 w-3.5" />
               <span>{item.text}</span>

@@ -53,7 +53,7 @@ function MobileNavItem({
       <div className="flex items-center">
         <Link
           href={link.href}
-          className="flex-1 rounded-lg py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+          className="flex-1 rounded-lg py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
           style={{ paddingLeft: `${paddingLeft}px`, paddingRight: "8px" }}
           onClick={onNavigate}
         >
@@ -63,7 +63,7 @@ function MobileNavItem({
           <button
             type="button"
             onClick={() => setOpen(!open)}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             aria-label={`${open ? "Sluit" : "Open"} submenu ${link.label}`}
           >
             <ChevronDown
@@ -332,18 +332,18 @@ export function Header({ menuItems = [] }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-white">
-      <div className="relative container mx-auto flex h-16 items-center justify-between gap-4 px-4">
+      <div className="relative container mx-auto flex h-14 items-center justify-between gap-4 px-4 md:h-16">
         {/* Mobile left: hamburger + search */}
         <div className="flex items-center gap-0.5 lg:hidden">
           <button
-            className="rounded-lg p-2 transition-colors hover:bg-muted active:scale-90"
+            className="flex h-11 w-11 items-center justify-center rounded-lg transition-colors hover:bg-muted active:scale-90"
             onClick={openMobileMenu}
             aria-label="Toggle menu"
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
           <button
-            className="rounded-lg p-2 transition-colors hover:bg-muted active:scale-90 md:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-lg transition-colors hover:bg-muted active:scale-90 md:hidden"
             onClick={openMobileSearch}
             aria-label="Search"
           >
@@ -406,7 +406,8 @@ export function Header({ menuItems = [] }: HeaderProps) {
           {/* Wishlist */}
           <Link
             href="/wishlist"
-            className="relative rounded-full p-2 text-foreground transition-all duration-200 hover:scale-110 hover:bg-muted active:scale-95"
+            aria-label="Wishlist"
+            className="relative flex h-11 w-11 items-center justify-center rounded-full text-foreground transition-all duration-200 hover:scale-110 hover:bg-muted active:scale-95"
           >
             <Heart className="h-5 w-5 transition-colors hover:text-purple" />
             {wishlistCount > 0 && (
@@ -421,7 +422,7 @@ export function Header({ menuItems = [] }: HeaderProps) {
             type="button"
             onClick={openCart}
             aria-label="Open cart"
-            className="relative rounded-full p-2 text-foreground transition-all duration-200 hover:scale-110 hover:bg-muted hover:text-purple active:scale-95"
+            className="relative flex h-11 w-11 items-center justify-center rounded-full text-foreground transition-all duration-200 hover:scale-110 hover:bg-muted hover:text-purple active:scale-95"
           >
             <ShoppingBag className="h-5 w-5" />
             {itemCount > 0 && (

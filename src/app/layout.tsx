@@ -91,6 +91,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: SITE_URL,
   },
+  // Google Merchant Center website verification (HTML-tag method).
+  verification: {
+    google: "zJu1G6zb-tfJq9Jr7AbAoMv6yN4ro4vwBkDLjzxXb_k",
+  },
 };
 
 export const viewport: Viewport = {

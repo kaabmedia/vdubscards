@@ -18,22 +18,22 @@ export function HeroSection({ floatingCards = [] }: HeroSectionProps) {
       <HeroFloatingCards cards={floatingCards} theme="light" />
 
       {/* Center content */}
-      <div className="relative z-10 flex flex-col items-center px-4 pb-[200px] pt-16 text-center md:pb-[200px] md:pt-24">
-        <h1 className="mx-auto max-w-lg text-3xl font-bold leading-tight text-gray-900 md:text-4xl lg:text-5xl">
+      <div className="relative z-10 flex flex-col items-center px-4 pb-8 pt-8 text-center md:pb-[200px] md:pt-24">
+        <h1 className="mx-auto max-w-lg text-2xl font-bold leading-tight text-gray-900 md:text-4xl lg:text-5xl">
           One of Europe&apos;s Largest Single-Card Marketplaces
         </h1>
         <Link
           href="/collections/all"
-          className="group mt-8 inline-flex items-center rounded-full bg-gray-900 px-8 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-gray-800 active:scale-95"
+          className="group mt-5 inline-flex items-center rounded-full bg-gray-900 px-8 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-gray-800 active:scale-95 md:mt-8"
         >
           Shop Now
         </Link>
 
       </div>
 
-      {/* Eagle mascot – bottom center, fully inside hero */}
+      {/* Eagle mascot – bottom center, desktop only (reserves ~200px; hidden on mobile to lift products above the fold) */}
       <div
-        className="pointer-events-none absolute bottom-0 left-1/2 z-[50] flex justify-center animate-mascot-pop"
+        className="pointer-events-none absolute bottom-0 left-1/2 z-[50] hidden justify-center animate-mascot-pop md:flex"
         style={{ marginLeft: -80, marginTop: -20, marginBottom: -20, transform: "translateX(-50%) translateY(-40px)" }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}

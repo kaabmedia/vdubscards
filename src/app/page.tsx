@@ -17,6 +17,7 @@ import { HeroSection } from "@/components/home/HeroSection";
 import { CountdownHeroSection } from "@/components/home/CountdownHeroSection";
 import { NewDropSection } from "@/components/home/NewDropSection";
 import { ProductSection } from "@/components/home/ProductSection";
+import { ProductStrip } from "@/components/home/ProductStrip";
 import { CollectionsSection } from "@/components/home/CollectionsSection";
 import { EventsSection } from "@/components/home/EventsSection";
 import { NewsletterSection } from "@/components/home/NewsletterSection";
@@ -72,6 +73,8 @@ export default async function HomePage() {
 
   const newArrivals = products.slice(4, 8);
   const recommendations = getRandomFromPool(pool, 4);
+  // Wider selection for the mobile "Popular right now" horizontal strip (above the fold).
+  const popularNow = getRandomFromPool(pool, 10);
   const onSaleProducts = getSaleFromPool(pool, 4);
 
   const storeJsonLd = {
@@ -128,6 +131,17 @@ export default async function HomePage() {
           <HeroSection floatingCards={floatingCards} />
         )}
       </div>
+
+      {/* Mobile: real products above the fold, directly under the compact hero */}
+      <div className="md:hidden">
+        <ProductStrip
+          title="Popular right now"
+          products={popularNow}
+          viewAllHref="/collections/all"
+          viewAllLabel="View all"
+        />
+      </div>
+
       {showNewDrop && (
         <NewDropSection
           imageUrl={newDrop.imageUrl}
@@ -137,7 +151,8 @@ export default async function HomePage() {
           buttonLink={newDrop.buttonLink}
         />
       )}
-      <div className="bg-gray-50">
+      {/* Desktop keeps the Recommendations grid; mobile uses the strip above instead */}
+      <div className="hidden bg-gray-50 md:block">
         <ProductSection
           title="Recommendations"
           products={recommendations}
@@ -145,16 +160,16 @@ export default async function HomePage() {
           viewAllLabel="View all"
         />
       </div>
-      <div className="bg-white">
+      <div className="cv-auto bg-white">
         <CollectionsSection collections={collections} />
       </div>
-      <div className="bg-gray-50">
+      <div className="cv-auto bg-gray-50">
         <EventsSection
           events={events}
           sliderImages={eventsSlider.enabled ? eventsSlider.images : undefined}
         />
       </div>
-      <div className="bg-white">
+      <div className="cv-auto bg-white">
         <ProductSection
           title="New arrivals"
           products={newArrivals}
@@ -162,7 +177,7 @@ export default async function HomePage() {
           viewAllLabel="View all"
         />
       </div>
-      <div className="bg-gray-50">
+      <div className="cv-auto bg-gray-50">
         <ProductSection
           title="On sale"
           products={onSaleProducts}
@@ -171,7 +186,9 @@ export default async function HomePage() {
           showSaleBadge
         />
       </div>
-      <NewsletterSection />
+      <div className="cv-auto">
+        <NewsletterSection />
+      </div>
     </div>
   );
 }
