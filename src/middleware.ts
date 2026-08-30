@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { isVacationActive } from "@/lib/vacation";
 
 /**
  * Country codes to block, ISO 3166-1 alpha-2. Configurable via the
@@ -29,6 +30,18 @@ function getCountry(request: NextRequest): string {
   ).toUpperCase();
 }
 
+/**
+ * next.config.ts proxyt de Shopify-checkout door op deze paden, zodat afrekenen op
+ * het eigen domein gebeurt. Tijdens de vakantie moeten ze dicht: /api/cart geeft dan
+ * geen checkoutUrl meer uit, maar een link uit de browsergeschiedenis of uit een
+ * Shopify "verlaten winkelwagen"-mail wijst hier nog steeds naartoe.
+ */
+const CHECKOUT_PATH_PREFIXES = ["/cart/c/", "/checkouts/", "/payments/"];
+
+function isCheckoutPath(pathname: string): boolean {
+  return CHECKOUT_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+}
+
 export function middleware(request: NextRequest) {
   const country = getCountry(request);
   if (country && BLOCKED_COUNTRIES.has(country)) {
@@ -36,6 +49,13 @@ export function middleware(request: NextRequest) {
       status: 403,
       headers: { "cache-control": "no-store" },
     });
+  }
+
+  // Vakantie: stuur elke poging om de doorgeproxyde Shopify-checkout te openen terug
+  // naar de winkelmand, waar de vakantiemelding staat.
+  if (isVacationActive() && isCheckoutPath(request.nextUrl.pathname)) {
+    const cartUrl = new URL("/cart", request.url);
+    return NextResponse.redirect(cartUrl, { status: 307 });
   }
 
   // Expose the visitor's country to client code (e.g. the US shipping notice)

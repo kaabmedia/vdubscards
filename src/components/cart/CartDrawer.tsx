@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { useCart, type CartLine } from "@/components/cart/CartProvider";
 import { trackBeginCheckout } from "@/lib/analytics/gtm";
+import { useVacation } from "@/components/vacation/VacationProvider";
+import { VacationCheckoutNotice } from "@/components/vacation/VacationCheckoutNotice";
 
 interface CartLineNode {
   id: string;
@@ -58,6 +60,7 @@ export function CartDrawer() {
     syncCartToShopify,
   } = useCart();
 
+  const onVacation = useVacation();
   const [cart, setCart] = useState<FetchedCart | null>(null);
   const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState<Set<string>>(new Set());
@@ -361,7 +364,9 @@ export function CartDrawer() {
               Shipping calculated at checkout · Inc. VAT
             </p>
 
-            {displayCheckoutUrl ? (
+            {onVacation ? (
+              <VacationCheckoutNotice className="mt-4" />
+            ) : displayCheckoutUrl ? (
               <a
                 href={displayCheckoutUrl}
                 onClick={() =>
@@ -396,7 +401,12 @@ export function CartDrawer() {
               View full cart
             </Link>
 
-            <div className="mt-4 flex items-center justify-center gap-4 text-[11px] text-muted-foreground">
+            {/* Verborgen tijdens de vakantie: er wordt nu niet betaald of verzonden. */}
+            <div
+              className={`mt-4 flex items-center justify-center gap-4 text-[11px] text-muted-foreground ${
+                onVacation ? "hidden" : ""
+              }`}
+            >
               <span className="flex items-center gap-1">
                 <ShieldCheck className="h-3.5 w-3.5" /> Secure payment
               </span>

@@ -1,38 +1,59 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { X } from "lucide-react";
-
-// Geëxporteerd zodat de vakantie-modal kan zien of deze melding al aan de beurt is
-// en er nooit twee modals tegelijk over elkaar heen vallen.
-export const REGION_DISMISS_KEY = "region_notice_dismissed_us";
-export const REGION_NOTICE_COUNTRY = "US";
+import { useVacation } from "@/components/vacation/VacationProvider";
+import {
+  REGION_DISMISS_KEY,
+  REGION_NOTICE_COUNTRY,
+} from "@/components/layout/RegionNoticeModal";
+import { VACATION_COPY, VACATION_DISMISS_KEY } from "@/lib/vacation";
 
 function getCookie(name: string): string | null {
   if (typeof document === "undefined") return null;
-  const match = document.cookie.match(
-    new RegExp(`(?:^|; )${name}=([^;]*)`)
-  );
+  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
   return match ? decodeURIComponent(match[1]) : null;
 }
 
+/** Zou de bestaande US-regiomelding deze pageview claimen? Dan wachten wij een bezoek. */
+function regionNoticeWillShow(): boolean {
+  try {
+    if (localStorage.getItem(REGION_DISMISS_KEY)) return false;
+  } catch {
+    return false;
+  }
+  return getCookie("visitor_country") === REGION_NOTICE_COUNTRY;
+}
+
 /**
- * One-time notice for US visitors: the shop ships EU-only. Country comes from the
- * `visitor_country` cookie set by middleware (Vercel/Cloudflare geo). Dismissal is
- * remembered in localStorage so it shows at most once per visitor.
+ * Eenmalige melding dat de shop met vakantie is. Zelfde patroon als
+ * RegionNoticeModal: dismissal in localStorage, dus maximaal één keer per bezoeker.
+ * De sleutel bevat de startdatum van de periode, zodat een volgende vakantie de
+ * melding weer laat zien.
  */
-export function RegionNoticeModal() {
+export function VacationNoticeModal() {
+  const onVacation = useVacation();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
+    if (!onVacation) return;
     try {
-      if (localStorage.getItem(REGION_DISMISS_KEY)) return;
+      if (localStorage.getItem(VACATION_DISMISS_KEY)) return;
     } catch {
-      /* ignore storage errors */
+      /* geen storage (privémodus) — dan tonen we hem gewoon */
     }
-    if (getCookie("visitor_country") === REGION_NOTICE_COUNTRY) {
-      setShow(true);
+    // Nooit stapelen op de US-regiomelding.
+    if (regionNoticeWillShow()) return;
+    setShow(true);
+  }, [onVacation]);
+
+  const dismiss = useCallback(() => {
+    try {
+      localStorage.setItem(VACATION_DISMISS_KEY, "1");
+    } catch {
+      /* ignore */
     }
+    setShow(false);
   }, []);
 
   // Lock scroll + close on Escape while open.
@@ -48,17 +69,7 @@ export function RegionNoticeModal() {
       document.body.style.overflow = original;
       window.removeEventListener("keydown", onKey);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [show]);
-
-  const dismiss = () => {
-    try {
-      localStorage.setItem(REGION_DISMISS_KEY, "1");
-    } catch {
-      /* ignore */
-    }
-    setShow(false);
-  };
+  }, [show, dismiss]);
 
   if (!show) return null;
 
@@ -67,7 +78,7 @@ export function RegionNoticeModal() {
       className="fixed inset-0 z-[90] flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="region-notice-title"
+      aria-labelledby="vacation-notice-title"
     >
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -87,22 +98,19 @@ export function RegionNoticeModal() {
 
         <div className="px-6 pb-6 pt-8 text-center">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/15 text-3xl">
-            🌍
+            🌴
           </div>
           <h2
-            id="region-notice-title"
+            id="vacation-notice-title"
             className="text-xl font-bold text-foreground"
           >
-            Welcome to V-Dub&apos;s!
+            {VACATION_COPY.modalTitle}
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            We are currently focusing on serving our collectors within the
-            European Union. While you are welcome to browse our collection,
-            please note that we do not currently ship orders to the United
-            States.
+            {VACATION_COPY.modalBody}
           </p>
           <p className="mt-3 text-sm font-medium text-foreground">
-            Thank you for your understanding!
+            {VACATION_COPY.modalClosing}
           </p>
 
           <button
@@ -110,7 +118,7 @@ export function RegionNoticeModal() {
             onClick={dismiss}
             className="mt-6 w-full rounded-lg bg-gray-900 py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-800 active:scale-[0.99]"
           >
-            Continue browsing
+            {VACATION_COPY.modalCta}
           </button>
         </div>
       </div>

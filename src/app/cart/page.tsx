@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/components/cart/CartProvider";
 import { trackBeginCheckout } from "@/lib/analytics/gtm";
+import { useVacation } from "@/components/vacation/VacationProvider";
+import { VacationCheckoutNotice } from "@/components/vacation/VacationCheckoutNotice";
 import {
   Loader2,
   Minus,
@@ -52,6 +54,7 @@ function formatPrice(amount: string | number): string {
 export default function CartPage() {
   const { lines, itemCount, cartId, checkoutUrl, syncCartToShopify, updateQuantity, removeLine } =
     useCart();
+  const onVacation = useVacation();
   const [cart, setCart] = useState<FetchedCart | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -458,7 +461,9 @@ export default function CartPage() {
               </p>
             </div>
 
-            {displayCheckoutUrl ? (
+            {onVacation ? (
+              <VacationCheckoutNotice className="mt-6" />
+            ) : displayCheckoutUrl ? (
               <a
                 href={displayCheckoutUrl}
                 onClick={() =>
@@ -486,8 +491,9 @@ export default function CartPage() {
               </button>
             )}
 
-            {/* Trust signals */}
-            <div className="mt-6 space-y-2.5">
+            {/* Trust signals — verborgen tijdens de vakantie: er wordt niet betaald,
+                verzonden of geretourneerd, dus deze beloftes kloppen dan niet. */}
+            <div className={`mt-6 space-y-2.5 ${onVacation ? "hidden" : ""}`}>
               <div className="flex items-center gap-2.5 text-xs text-muted-foreground">
                 <ShieldCheck className="h-4 w-4 shrink-0" />
                 <span>Secure payment via Shopify</span>

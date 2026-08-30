@@ -14,6 +14,8 @@ import type {
 } from "@/lib/shopify/types";
 import { AddToCartButton } from "@/components/shop/AddToCartButton";
 import { ProductStickyBar } from "@/components/shop/ProductStickyBar";
+import { VacationProductNotice } from "@/components/vacation/VacationProductNotice";
+import { VacationShippingLabel } from "@/components/vacation/VacationShippingLabel";
 import { TrackViewItem } from "@/components/analytics/TrackViewItem";
 import { ProductImageGallery } from "@/components/shop/ProductImageGallery";
 import { InfiniteRelatedProducts } from "@/components/shop/InfiniteRelatedProducts";
@@ -337,6 +339,7 @@ export default async function ProductPage({
                   category={primaryCollection?.title}
                 />
               )}
+              <VacationProductNotice />
             </div>
 
             {/* Trust signals */}
@@ -356,7 +359,7 @@ export default async function ProductPage({
               <div className="flex items-center gap-2.5 rounded-lg border border-border bg-white px-3 py-2.5">
                 <Package className="h-4 w-4 shrink-0 text-muted-foreground" />
                 <span className="text-xs text-muted-foreground">
-                  Shipped within 1-3 days
+                  <VacationShippingLabel normal="Shipped within 1-3 days" />
                 </span>
               </div>
               <div className="flex items-center gap-2.5 rounded-lg border border-border bg-white px-3 py-2.5">

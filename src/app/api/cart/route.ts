@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { shopifyFetch } from "@/lib/shopify/client";
+import { isVacationActive } from "@/lib/vacation";
 import {
   CART_QUERY,
   CREATE_CART_MUTATION,
@@ -7,6 +8,25 @@ import {
   CART_LINES_UPDATE_MUTATION,
   CART_LINES_REMOVE_MUTATION,
 } from "@/lib/shopify/queries";
+
+/**
+ * Serverzijdige rem op afrekenen tijdens de vakantie.
+ *
+ * De UI verbergt de Checkout-knop al, maar die beslissing valt in de browser en kan
+ * uit een gecachete pagina komen. Door de checkoutUrl hier weg te laten krijgt de
+ * client simpelweg geen Shopify-checkoutlink meer — ook niet via de devtools of een
+ * losse fetch. Het einde van de periode zet hem er vanzelf weer in.
+ *
+ * Let op: dit blokkeert alleen de weg via deze storefront. Een eerder gekopieerde
+ * checkoutlink blijft bij Shopify geldig; wil je dat óók dichtzetten, pauzeer dan de
+ * verkoop in Shopify zelf.
+ */
+function withVacationGuard<T extends { checkoutUrl?: string | null }>(
+  payload: T | null
+): T | null {
+  if (!payload || !isVacationActive()) return payload;
+  return { ...payload, checkoutUrl: null };
+}
 
 /** GET /api/cart?cartId=... - Haal cart op met productinformatie */
 export async function GET(request: NextRequest) {
@@ -23,7 +43,7 @@ export async function GET(request: NextRequest) {
       variables: { cartId },
     });
     const cart = data?.cart ?? null;
-    return NextResponse.json(cart);
+    return NextResponse.json(withVacationGuard(cart));
   } catch (e) {
     console.error("Cart GET error:", e);
     return NextResponse.json(
@@ -70,7 +90,7 @@ export async function POST(request: NextRequest) {
         await new Promise((r) => setTimeout(r, CART_RETRY_DELAY_MS * attempt));
       }
       const result = await executeCartPost(cartId, linesArr, cartLineInput);
-      return NextResponse.json(result);
+      return NextResponse.json(withVacationGuard(result));
     } catch (e) {
       lastError = e;
       if (!isCartConflictError(e) || attempt === MAX_CART_RETRIES - 1) break;

@@ -9,6 +9,8 @@ import { Footer } from "@/components/layout/Footer";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { RegionNoticeModal } from "@/components/layout/RegionNoticeModal";
+import { VacationProvider } from "@/components/vacation/VacationProvider";
+import { VacationNoticeModal } from "@/components/vacation/VacationNoticeModal";
 import { WishlistProvider } from "@/components/wishlist/WishlistProvider";
 import { ShopifyAnalytics } from "@/components/analytics/ShopifyAnalytics";
 import { shopifyFetch } from "@/lib/shopify/client";
@@ -21,6 +23,7 @@ import {
   type NavLink,
 } from "@/lib/shopify/menu";
 import { getHomeSettings } from "@/lib/sanity/countdown";
+import { isVacationActive } from "@/lib/vacation";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -174,6 +177,11 @@ export default async function RootLayout({
 
   const shopId = await getShopId();
 
+  // Vakantiemodus: serverwaarde als startpunt zodat SSR en hydratie identiek zijn.
+  // De VacationProvider herrekent daarna op de klok van de bezoeker, zodat een
+  // statisch gecachete pagina zichzelf corrigeert rond 1 sep / 1 okt.
+  const vacationActive = isVacationActive();
+
   const { newDrop } = await getCachedHomeSettings();
   if (!newDrop.enabled) {
     menuItems = filterOutNewDrop(menuItems);
@@ -272,6 +280,7 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
           suppressHydrationWarning
         />
+        <VacationProvider initialActive={vacationActive}>
         <CartProvider>
           <WishlistProvider>
             <Suspense>
@@ -283,8 +292,10 @@ export default async function RootLayout({
             <Footer />
             <CartDrawer />
             <RegionNoticeModal />
+            <VacationNoticeModal />
           </WishlistProvider>
         </CartProvider>
+        </VacationProvider>
       </body>
     </html>
   );
