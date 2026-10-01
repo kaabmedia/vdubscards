@@ -136,10 +136,25 @@ export function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-gray-100">
         <div className="container mx-auto flex flex-col items-center justify-between gap-4 px-4 py-5 sm:flex-row">
-          <p className="text-xs text-gray-400">
-            &copy; {new Date().getFullYear()} V-Dub&apos;s Cards. All rights
-            reserved.
-          </p>
+          <div className="flex flex-col items-center gap-1 text-xs text-gray-400 sm:items-start">
+            <p>
+              &copy; {new Date().getFullYear()} V-Dub&apos;s Cards. All rights
+              reserved.
+            </p>
+            <p>
+              Made by{" "}
+              <a
+                href="https://kaabmedia.nl"
+                target="_blank"
+                // No noreferrer on purpose: the agency credit should show up as
+                // referral traffic. noopener keeps the security benefit.
+                rel="noopener"
+                className="font-semibold text-gray-500 transition-colors duration-200 hover:text-gray-900"
+              >
+                KAAB&reg;
+              </a>
+            </p>
+          </div>
           <div className="flex flex-wrap items-center justify-center gap-2">
             {[
               { src: "/betaalmethoden/visa.svg", alt: "Visa" },
