@@ -3,13 +3,11 @@ import { shopifyFetch } from "@/lib/shopify/client";
 import {
   PRODUCTS_QUERY,
   PRODUCT_POOL_QUERY,
-  PRODUCTS_BY_COLLECTION_QUERY,
   COLLECTIONS_QUERY,
 } from "@/lib/shopify/queries";
 import type {
   ProductsResponse,
   CollectionsResponse,
-  CollectionWithProductsResponse,
   ShopifyProduct,
   ShopifyCollection,
 } from "@/lib/shopify/types";
@@ -49,18 +47,12 @@ export const metadata: Metadata = {
 export const revalidate = 1800;
 
 export default async function HomePage() {
-  const homePromise = getHomeSettings();
-  // Supplies-producten komen uit de collectie waar de knop naartoe linkt (instelbaar in Sanity).
-  const suppliesPromise = homePromise.then((h) =>
-    h.supplies.enabled ? getSuppliesProducts(h.supplies.buttonLink) : []
-  );
-  const [products, collections, pool, events, home, suppliesProducts] = await Promise.all([
+  const [products, collections, pool, events, home] = await Promise.all([
     getProducts(24),
     getCollections(),
     fetchProductPool(),
     getUpcomingEvents(3),
-    homePromise,
-    suppliesPromise,
+    getHomeSettings(),
   ]);
 
   const { countdown, heroFloatingCardsSource, heroFloatingCards, newDrop, supplies, eventsSlider } = home;
@@ -169,7 +161,6 @@ export default async function HomePage() {
           text={supplies.text}
           buttonText={supplies.buttonText}
           buttonLink={supplies.buttonLink}
-          products={suppliesProducts}
         />
       )}
 
@@ -222,23 +213,6 @@ async function getProducts(limit = 24): Promise<ShopifyProduct[]> {
       variables: { first: limit },
     });
     return data?.products?.edges?.map((e) => e.node) ?? [];
-  } catch {
-    return [];
-  }
-}
-
-/** Max 3 beschikbare producten uit de collectie van de supplies-knop (fallback: "supplies"). */
-async function getSuppliesProducts(buttonLink: string): Promise<ShopifyProduct[]> {
-  const handle = buttonLink.match(/\/collections\/([^/?#]+)/)?.[1] ?? "supplies";
-  try {
-    const data = await shopifyFetch<CollectionWithProductsResponse>({
-      query: PRODUCTS_BY_COLLECTION_QUERY,
-      variables: { handle, first: 6 },
-    });
-    const nodes = data?.collection?.products?.edges?.map((e) => e.node) ?? [];
-    return nodes
-      .filter((p) => p.variants?.edges?.[0]?.node.availableForSale !== false)
-      .slice(0, 3);
   } catch {
     return [];
   }

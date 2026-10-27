@@ -22,7 +22,7 @@ export interface NewDropSettings {
 
 export interface SuppliesSettings {
   enabled: boolean;
-  imageUrl: string | null;
+  imageUrl: string;
   title: string;
   text: string;
   buttonText: string;
@@ -100,7 +100,7 @@ export async function getHomeSettings(): Promise<HomeSettings> {
   // Supplies staat standaard aan: ook zonder Sanity-velden toont de homepage dit blok.
   const defaultSupplies: SuppliesSettings = {
     enabled: true,
-    imageUrl: null,
+    imageUrl: "/supplies.jpg",
     title: "Protect your cards",
     text: "Toploaders, storage cases and more. Everything you need to keep your collection in mint condition.",
     buttonText: "Shop all supplies",
@@ -185,7 +185,7 @@ export async function getHomeSettings(): Promise<HomeSettings> {
 
     const supplies: SuppliesSettings = {
       enabled: doc?.suppliesEnabled !== false,
-      imageUrl: imageUrl(doc?.suppliesImage as Parameters<typeof imageUrl>[0]),
+      imageUrl: imageUrl(doc?.suppliesImage as Parameters<typeof imageUrl>[0]) ?? defaultSupplies.imageUrl,
       title: doc?.suppliesTitle || defaultSupplies.title,
       text: doc?.suppliesText || defaultSupplies.text,
       buttonText: doc?.suppliesButtonText || defaultSupplies.buttonText,

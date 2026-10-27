@@ -140,7 +140,7 @@ export const countdown = defineType({
       name: "suppliesEnabled",
       title: "Supplies sectie tonen",
       type: "boolean",
-      description: "Aan: toont onder 'Popular right now' een blok dat de supplies promoot, met de supplies-producten en een knop",
+      description: "Aan: toont onder 'Popular right now' een blok dat de supplies promoot, met foto, tekst en een knop",
       initialValue: true,
     }),
     defineField({
@@ -148,7 +148,7 @@ export const countdown = defineType({
       title: "Supplies afbeelding",
       type: "image",
       options: { hotspot: true },
-      description: "Optioneel. Zonder afbeelding worden de productfoto's uit de supplies-collectie getoond.",
+      description: "Optioneel. Vervangt de standaard supplies-foto. Liefst liggend (ongeveer 6:5) met lichte achtergrond.",
       hidden: ({ parent }) => parent?.suppliesEnabled === false,
     }),
     defineField({
@@ -176,7 +176,7 @@ export const countdown = defineType({
       name: "suppliesButtonLink",
       title: "Supplies knop link",
       type: "string",
-      description: "Bijv. /collections/supplies. De producten in het blok komen uit deze collectie.",
+      description: "Bijv. /collections/supplies",
       hidden: ({ parent }) => parent?.suppliesEnabled === false,
     }),
     defineField({
