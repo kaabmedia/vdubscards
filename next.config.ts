@@ -31,15 +31,10 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: [
-      { protocol: "https", hostname: "cdn.shopify.com", pathname: "/**" },
-      { protocol: "https", hostname: "cdn.sanity.io", pathname: "/**" },
-      { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
-    ],
-    formats: ["image/avif", "image/webp"],
-    // Shopify/Sanity image URLs are content-hashed, so a replaced photo gets a new
-    // URL — caching optimized variants for 31 days is safe and avoids re-optimizing.
-    minimumCacheTTL: 2678400,
+    // Resizing happens on the Shopify/Sanity CDNs instead of Vercel Image Optimization,
+    // which bills per transformation and cache read/write. See src/lib/image-loader.ts.
+    loader: "custom",
+    loaderFile: "./src/lib/image-loader.ts",
   },
 
   async headers() {
